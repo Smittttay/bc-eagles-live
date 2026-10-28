@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#75132d">
+  <title>BC Eagles Live</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">BC</div>
+      <div>
+        <h1>Eagles Live</h1>
+        <p>All Eagles. Every Game.</p>
+      </div>
+    </div>
+    <span class="version">SPRINT 1</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">BOSTON COLLEGE ATHLETICS</div>
+      <h2>Every game.<br>One place.</h2>
+      <p>Scores, schedules and game coverage for your Eagles.</p>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <h2>Remaining BC Games</h2>
+        <button id="refresh">Refresh</button>
+      </div>
+      <div id="status" class="status">Connecting to BC Athletics…</div>
+      <div id="games" class="games"></div>
+    </section>
+
+    <section class="section">
+      <h2>Explore Sports</h2>
+      <div id="sports" class="sports"></div>
+    </section>
+
+    <section class="section">
+      <h2>Schedule</h2>
+      <label for="sport-filter">Filter by sport</label>
+      <select id="sport-filter">
+        <option value="all">All sports</option>
+      </select>
+      <div id="schedule" class="games"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="#games">Home</a>
+    <a href="#sports">Sports</a>
+    <a href="#schedule">Schedule</a>
+  </nav>
+  <script src="/static/app.js"></script>
+</body>
+</html>
