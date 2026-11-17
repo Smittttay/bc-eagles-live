@@ -281,6 +281,79 @@
     }, "secondary");
   }
 
+
+  // STEP 224E — Native box scores for completed Lacrosse games.
+  function appendSeasonBoxscoreRow(schedule, row, game) {
+    const url = String(game.box_score_url || "");
+
+    const match = url.match(
+      /^https:\/\/bceagles\.com\/sports\/womens-lacrosse\/stats\/[^?#]+\/boxscore\/(\d+)\/?$/i
+    );
+
+    if (
+      game.sport_id !== "womens-lacrosse" ||
+      !isFinal(game) ||
+      !match
+    ) {
+      schedule.append(row);
+      return;
+    }
+
+    // Separate sibling buttons, never nested buttons.
+    const wrapper = document.createElement("div");
+    wrapper.className = "bc-season-boxscore-row";
+
+    wrapper.style.cssText = [
+      "display:flex",
+      "align-items:stretch",
+      "gap:7px",
+      "width:100%",
+      "min-width:0"
+    ].join(";");
+
+    row.style.flex = "1 1 auto";
+    row.style.minWidth = "0";
+    row.style.width = "auto";
+
+    const box = document.createElement("button");
+    box.type = "button";
+    box.className = "bc-season-boxscore";
+    box.textContent = "BOX SCORE";
+
+    box.setAttribute(
+      "aria-label",
+      "View box score for " + (game.opponent || "this game")
+    );
+
+    box.style.cssText = [
+      "flex:0 0 auto",
+      "align-self:center",
+      "padding:10px 9px",
+      "border:0",
+      "border-radius:7px",
+      "background:#8a1538",
+      "color:#fff",
+      "font-size:10px",
+      "font-weight:800",
+      "white-space:nowrap",
+      "cursor:pointer"
+    ].join(";");
+
+    box.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (typeof window.bcOpenNativeBoxscore === "function") {
+        window.bcOpenNativeBoxscore(match[1], url);
+      } else {
+        window.open(url, "_blank", "noopener");
+      }
+    });
+
+    wrapper.append(row, box);
+    schedule.append(wrapper);
+  }
+
   function seasonPage(id) {
     const list = sportGames(id);
     const name = sportNames[id] || id;
@@ -395,7 +468,7 @@
             }
 
             row.append(date, opponent, result);
-            schedule.append(row);
+            appendSeasonBoxscoreRow(schedule, row, game);
           });
 
           details.append(schedule);
@@ -464,7 +537,7 @@
         );
       }
       row.append(date, opponent, result);
-      schedule.append(row);
+      appendSeasonBoxscoreRow(schedule, row, game);
     });
     page.append(schedule);
 

@@ -69,3 +69,86 @@ def sport_roster(sport_id: str):
             status_code=503,
             detail=f"Official BC roster unavailable: {exc}"
         ) from exc
+
+
+# STEP 220 — Native women's lacrosse box scores
+import asyncio
+import re
+import time
+from starlette.concurrency import run_in_threadpool
+from backend.boxscores import fetch_boxscore, validate_url
+
+_boxscore_cache = {}
+_boxscore_schedule_cache = {"expires": 0, "games": []}
+_boxscore_schedule_lock = asyncio.Lock()
+
+
+async def _official_boxscore_url(boxscore_id: str):
+    """Resolve an ID using official URLs from the BC schedule."""
+    async with _boxscore_schedule_lock:
+        now = time.monotonic()
+
+        if now >= _boxscore_schedule_cache["expires"]:
+            payload = await fetch_schedule()
+            _boxscore_schedule_cache["games"] = payload["games"]
+            _boxscore_schedule_cache["expires"] = now + 600
+
+        for game in _boxscore_schedule_cache["games"]:
+            url = game.get("box_score_url") or ""
+            if not url:
+                continue
+
+            try:
+                validate_url(url)
+            except (ValueError, TypeError):
+                continue
+
+            if url.rstrip("/").endswith("/boxscore/" + boxscore_id):
+                return url
+
+    return None
+
+
+@app.get("/api/boxscore/{boxscore_id}")
+async def native_boxscore(boxscore_id: str):
+    if not re.fullmatch(r"[0-9]{1,12}", boxscore_id):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid box score ID"
+        )
+
+    cached = _boxscore_cache.get(boxscore_id)
+    if cached and time.monotonic() < cached["expires"]:
+        return cached["data"]
+
+    try:
+        url = await _official_boxscore_url(boxscore_id)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Official BC schedule temporarily unavailable"
+        ) from exc
+
+    if not url:
+        raise HTTPException(
+            status_code=404,
+            detail="Women's lacrosse box score not found"
+        )
+
+    try:
+        data = await run_in_threadpool(fetch_boxscore, url)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Official box score temporarily unavailable"
+        ) from exc
+
+    data["official_url"] = url
+    data["boxscore_id"] = boxscore_id
+
+    _boxscore_cache[boxscore_id] = {
+        "data": data,
+        "expires": time.monotonic() + 3600
+    }
+
+    return data

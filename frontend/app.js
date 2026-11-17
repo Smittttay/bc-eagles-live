@@ -386,6 +386,20 @@ function recentScoreRow(game) {
   button.className = "bc-box-score-button";
   button.textContent = "BOX SCORE ↗";
 
+  // STEP 222B: Open native women's lacrosse statistics.
+  if (/\/sports\/womens-lacrosse\/stats\//i.test(boxUrl)) {
+    const match = boxUrl.match(/\/boxscore\/(\d+)\/?$/i);
+    if (match) {
+      button.textContent = "BOX SCORE";
+      button.addEventListener("click", event => {
+        if (typeof window.bcOpenNativeBoxscore !== "function") return;
+        event.preventDefault();
+        event.stopPropagation();
+        window.bcOpenNativeBoxscore(match[1], boxUrl);
+      });
+    }
+  }
+
   button.style.cssText = [
     "display:inline-flex",
     "align-items:center",
