@@ -78,6 +78,7 @@ import time
 from starlette.concurrency import run_in_threadpool
 from backend.boxscores import fetch_boxscore, validate_url
 from backend.football_boxscores import fetch_football_boxscore, validate_football_url
+from backend.basketball_boxscores import fetch_basketball_boxscore, validate_basketball_url
 
 _boxscore_cache = {}
 _boxscore_schedule_cache = {"expires": 0, "games": []}
@@ -104,6 +105,11 @@ async def _official_boxscore_url(boxscore_id: str):
                     validate_football_url(url)
                 elif game.get("sport_id") == "womens-lacrosse":
                     validate_url(url)
+                elif game.get("sport_id") in (
+                    "mens-basketball", "womens-basketball"
+                ):
+                    if not validate_basketball_url(url):
+                        continue
                 else:
                     continue
             except (ValueError, TypeError):
@@ -145,6 +151,13 @@ async def native_boxscore(boxscore_id: str):
         if "/sports/football/stats/" in url:
             data = await run_in_threadpool(
                 fetch_football_boxscore, url
+            )
+        elif (
+            "/sports/mens-basketball/stats/" in url
+            or "/sports/womens-basketball/stats/" in url
+        ):
+            data = await run_in_threadpool(
+                fetch_basketball_boxscore, url
             )
         else:
             data = await run_in_threadpool(

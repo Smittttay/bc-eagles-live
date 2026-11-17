@@ -287,11 +287,11 @@
     const url = String(game.box_score_url || "");
 
     const match = url.match(
-      /^https:\/\/bceagles\.com\/sports\/(?:womens-lacrosse|football)\/stats\/[^?#]+\/boxscore\/(\d+)\/?$/i
+      /^https:\/\/bceagles\.com\/sports\/(?:womens-lacrosse|football|mens-basketball|womens-basketball)\/stats\/[^?#]+\/boxscore\/(\d+)\/?$/i
     );
 
     if (
-      !["womens-lacrosse", "football"].includes(game.sport_id) ||
+      !["womens-lacrosse", "football", "mens-basketball", "womens-basketball"].includes(game.sport_id) ||
       !isFinal(game) ||
       !match
     ) {

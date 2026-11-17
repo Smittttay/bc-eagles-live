@@ -345,6 +345,176 @@
     ));
   }
 
+
+  // STEP 245 — Men's and Women's Basketball native statistics.
+  function renderBasketball(data, url) {
+    content.replaceChildren();
+
+    const bcName = "Boston College";
+    const opponent = data.opponent;
+    const bc = data.scoring[bcName];
+    const other = data.scoring[opponent];
+
+    if (!bc || !other) {
+      throw new Error("Missing basketball scores");
+    }
+
+    const score = el("div", null, "bc-native-score");
+
+    for (const [name, total] of [
+      ["BOSTON COLLEGE", bc.total],
+      [opponent.toUpperCase(), other.total]
+    ]) {
+      const team = el("div", null, "bc-native-team");
+      team.appendChild(el("div", name, "bc-native-team-name"));
+      team.appendChild(el("div", total, "bc-native-number"));
+      score.appendChild(team);
+
+      if (name === "BOSTON COLLEGE") {
+        score.appendChild(el("div", "FINAL", "bc-native-final"));
+      }
+    }
+
+    content.appendChild(score);
+
+    const labels = bc.periods.map((_, i) =>
+      bc.periods.length === 2 ? "H" + (i + 1) : "Q" + (i + 1)
+    );
+
+    section("Scoring by " +
+      (bc.periods.length === 2 ? "Half" : "Quarter")
+    ).appendChild(table(
+      ["Team", ...labels, "Total"],
+      [
+        [bcName, ...bc.periods, bc.total],
+        [opponent, ...other.periods, other.total]
+      ]
+    ));
+
+    // Full official player statistics for both teams.
+    for (const name of [bcName, opponent]) {
+      const stats = data.players[name];
+
+      if (!stats || !stats.headers || !stats.rows) continue;
+
+      const headers = stats.headers.map(h => {
+        const names = {
+          "gs": "START",
+          "min": "MIN",
+          "fg": "FG",
+          "3pt": "3PT",
+          "ft": "FT",
+          "orb-drb": "OREB-DREB",
+          "reb": "REB",
+          "pf": "PF",
+          "a": "AST",
+          "to": "TO",
+          "blk": "BLK",
+          "stl": "STL",
+          "pts": "PTS"
+        };
+        return names[String(h).toLowerCase()] || h;
+      });
+
+      section(name + " — Player Statistics")
+        .appendChild(table(headers, stats.rows));
+    }
+
+    // Team shooting totals and percentages by period.
+    for (const name of [bcName, opponent]) {
+      const summary = data.shooting[name];
+
+      if (!summary || !summary.headers || !summary.rows) continue;
+
+      const sectionName = name + " — Shooting Summary";
+      const area = section(sectionName);
+
+      // Official data alternates attempts and percentage rows.
+      // Combine each pair into one correctly labeled table row.
+      const summaryRows = [];
+
+      for (let i = 0; i < summary.rows.length; i += 2) {
+        const attempts = summary.rows[i] || [];
+        const percentages = summary.rows[i + 1] || [];
+
+        if (attempts.length !== 4 || percentages.length !== 3) {
+          continue;
+        }
+
+        summaryRows.push([
+          attempts[0],
+          attempts[1], percentages[0],
+          attempts[2], percentages[1],
+          attempts[3], percentages[2]
+        ]);
+      }
+
+      area.appendChild(table(
+        ["Period", "FG", "FG%", "3PT", "3PT%", "FT", "FT%"],
+        summaryRows
+      ));
+    }
+
+    // Additional official team comparison statistics.
+    if (Array.isArray(data.team_stats) && data.team_stats.length) {
+      const stats = section("Additional Team Statistics");
+      const teams = Object.keys(data.scoring || {});
+      const opponent = teams.find(name => name !== "Boston College");
+      const bc = "Boston College";
+      const comparison = [];
+
+      for (let i = 1; i < data.team_stats.length - 2; i++) {
+        const heading = data.team_stats[i];
+
+        if (!Array.isArray(heading) || heading.length !== 1) {
+          continue;
+        }
+
+        const first = data.team_stats[i + 1];
+        const second = data.team_stats[i + 2];
+
+        if (!Array.isArray(first) || !Array.isArray(second)) {
+          continue;
+        }
+
+        const byTeam = {
+          [first[0]]: first[first.length - 1],
+          [second[0]]: second[second.length - 1]
+        };
+
+        if (opponent && opponent in byTeam && bc in byTeam) {
+          comparison.push([
+            heading[0],
+            byTeam[opponent],
+            byTeam[bc]
+          ]);
+        }
+
+        i += 2;
+      }
+
+      if (comparison.length) {
+        stats.appendChild(
+          table(["Statistic", opponent, bc], comparison)
+        );
+      } else {
+        stats.appendChild(el(
+          "p",
+          "Detailed team comparisons are available in the official box score."
+        ));
+      }
+    }
+
+    officialLink(url);
+
+    content.appendChild(el(
+      "p",
+      "Basketball statistics sourced from the official " +
+      "Boston College Athletics box score.",
+      "bc-native-note"
+    ));
+  }
+
   function render(data, url) {
     content.replaceChildren();
 
@@ -426,6 +596,11 @@
       }
       if (data.sport === "football") {
         renderFootball(data, officialUrl);
+      } else if (
+        data.sport === "mens-basketball" ||
+        data.sport === "womens-basketball"
+      ) {
+        renderBasketball(data, officialUrl);
       } else {
         render(data, officialUrl);
       }
