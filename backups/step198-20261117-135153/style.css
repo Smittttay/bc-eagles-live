@@ -1,0 +1,2295 @@
+:root {
+  --maroon: #75132d;
+  --dark: #4c0d20;
+  --gold: #e9bd69;
+  --bg: #f5f5f7;
+  --text: #202127;
+  --muted: #70727b;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  padding-bottom: 75px;
+}
+header {
+  background: var(--maroon);
+  color: white;
+  padding: 18px max(20px, calc((100vw - 900px)/2));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo {
+  background: white;
+  color: var(--maroon);
+  font-weight: 900;
+  font-size: 23px;
+  padding: 12px;
+  border-radius: 12px;
+}
+h1 { font-size: 23px; margin: 0; }
+header p { margin: 3px 0 0; font-size: 12px; opacity: .8; }
+.version { font-size: 10px; color: var(--gold); }
+main { max-width: 900px; margin: auto; padding: 16px; }
+.hero {
+  background: linear-gradient(130deg, var(--maroon), var(--dark));
+  color: white;
+  border-radius: 18px;
+  padding: 30px 24px;
+}
+.eyebrow { color: var(--gold); font-size: 11px; letter-spacing: 2px; }
+.hero h2 { font-size: clamp(32px, 6vw, 48px); line-height: 1.1; margin: 15px 0; }
+.hero p { color: #f1dce3; }
+.section { margin-top: 28px; }
+.section h2 { font-size: 21px; }
+.section-heading { display: flex; justify-content: space-between; align-items: center; }
+button, select {
+  border: 1px solid #dedee2;
+  border-radius: 9px;
+  padding: 10px 14px;
+  background: white;
+  font-size: 14px;
+}
+button { cursor: pointer; }
+.status { color: var(--muted); padding: 15px 0; font-size: 14px; }
+.games { display: grid; gap: 10px; margin-top: 12px; }
+.game {
+  display: block;
+  background: white;
+  border-radius: 13px;
+  padding: 18px;
+  border: 1px solid #e9e9ed;
+  text-decoration: none;
+  color: inherit;
+}
+.game .sport { font-size: 11px; color: var(--maroon); font-weight: 800; }
+.game .opponent { font-size: 17px; font-weight: 700; margin: 8px 0; }
+.game .date { font-size: 13px; color: var(--muted); }
+.sports {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.sport-card {
+  background: white;
+  border: 1px solid #e9e9ed;
+  border-radius: 12px;
+  padding: 20px 14px;
+  text-align: left;
+  font-weight: 650;
+  cursor: pointer;
+}
+.sport-card:hover, .game:hover { border-color: var(--maroon); }
+label { display: block; font-size: 13px; margin-bottom: 8px; }
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 16px;
+  background: white;
+  border-top: 1px solid #ddd;
+}
+.bottom-nav a { text-decoration: none; color: var(--maroon); font-weight: 650; }
+@media (min-width: 650px) {
+  .sports { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+
+/* BC Eagles Live scoring celebrations */
+.alert-settings {
+  background: white;
+  padding: 22px;
+  border: 1px solid #e9e9ed;
+  border-radius: 14px;
+  display: grid;
+  gap: 14px;
+}
+.alert-settings select { width: 100%; }
+.alert-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+.alert-check input { width: 18px; height: 18px; }
+.test-score {
+  background: #75132d;
+  color: white;
+  font-weight: 800;
+  padding: 15px;
+}
+.alert-note {
+  color: #70727b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.score-celebration[hidden] { display: none; }
+.score-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(35, 5, 16, .92);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.celebration-content {
+  background: #75132d;
+  border: 4px solid #e9bd69;
+  color: white;
+  border-radius: 22px;
+  text-align: center;
+  padding: 40px 25px;
+  width: min(100%, 480px);
+  box-shadow: 0 0 60px rgba(233, 189, 105, .3);
+  animation: eagle-pop .4s ease-out;
+}
+.celebration-eagle {
+  font-size: 60px;
+  font-weight: 1000;
+  color: #e9bd69;
+}
+.celebration-content h2 {
+  font-size: clamp(30px, 7vw, 48px);
+  color: white;
+  margin: 15px 0;
+}
+.celebration-content p {
+  color: #e9bd69;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+.celebration-content button {
+  margin-top: 20px;
+  min-width: 120px;
+}
+@keyframes eagle-pop {
+  from { transform: scale(.75); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Eagles settings navigation */
+.eagles-top-tools {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  justify-content: flex-end;
+  background: #75132d;
+  padding: 10px 18px;
+  border-bottom: 2px solid #e9bd69;
+}
+.eagles-top-tools button {
+  background: #e9bd69;
+  color: #45101f;
+  border: none;
+  border-radius: 9px;
+  padding: 10px 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+#alerts[hidden] { display: none !important; }
+#alerts:not([hidden]) {
+  position: fixed;
+  z-index: 500;
+  top: 70px;
+  right: 16px;
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100dvh - 90px);
+  overflow-y: auto;
+  background: #fff;
+  color: #222;
+  padding: 18px;
+  border: 2px solid #e9bd69;
+  border-radius: 15px;
+  box-shadow: 0 15px 50px rgba(0,0,0,.3);
+}
+
+/* EAGLES LIVE DASHBOARD 2.0 */
+body.dashboard-page {
+  margin: 0;
+  background: #f3f3f4;
+  color: #1d2030;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.dashboard-page *, .dashboard-page *::before,
+.dashboard-page *::after { box-sizing: border-box; }
+.dashboard-page .eagles-banner {
+  position: relative;
+  overflow: hidden;
+  min-height: 165px;
+  background:
+    linear-gradient(90deg,rgba(48,0,15,.98),rgba(95,0,31,.75) 45%,rgba(30,0,14,.75)),
+    linear-gradient(145deg,#38000f,#8b1638 65%,#25000c);
+  color: white;
+  padding: 22px 5%;
+}
+.dashboard-page .banner-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 1450px;
+  margin: auto;
+}
+.dashboard-page .banner-monogram {
+  font-size: 68px;
+  font-weight: 1000;
+  font-style: italic;
+  letter-spacing: -12px;
+  padding-right: 12px;
+  color: #e9bd69;
+  text-shadow: 3px 4px #26000b, -2px -2px white;
+}
+.dashboard-page .banner-title span {
+  display: block;
+  font-size: clamp(13px,2vw,23px);
+  letter-spacing: 3px;
+  color: #f0c873;
+  font-weight: 900;
+}
+.dashboard-page .banner-title h1 {
+  margin: 0;
+  font-size: clamp(36px,5.7vw,76px);
+  font-weight: 1000;
+  font-style: italic;
+  line-height: 1;
+  color: white;
+  letter-spacing: -2px;
+}
+.dashboard-page .banner-motto {
+  margin-left: auto;
+  font-size: clamp(20px,3vw,38px);
+  line-height: .95;
+  color: #f3c66d;
+  font-style: italic;
+  font-weight: 900;
+  text-align: right;
+  transform: rotate(-8deg);
+}
+.dashboard-page .stadium-art {
+  position: absolute;
+  inset: auto 0 0;
+  height: 24px;
+  background: repeating-linear-gradient(
+    100deg, #30000f 0 10px, #ae4150 11px 14px,
+    #e3b76d 15px 16px, #410018 17px 24px);
+  opacity: .5;
+}
+.dashboard-page .eagles-nav {
+  position: sticky;
+  top: 0;
+  z-index: 400;
+  background: #79001e;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 5px;
+  padding: 9px max(12px,3vw);
+  box-shadow: 0 3px 10px #0002;
+}
+.dashboard-page .eagles-nav a,
+.dashboard-page .eagles-nav button {
+  color: white;
+  text-decoration: none;
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 900;
+  padding: 12px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dashboard-page .eagles-nav a:hover,
+.dashboard-page .eagles-nav button:hover { background: #ffffff24; }
+.dashboard-page .eagles-nav .nav-active {
+  background: #f0c56e;
+  color: #590019;
+}
+.dashboard-page .nav-bell { font-size: 20px; }
+.dashboard-page .dashboard-main {
+  max-width: 1500px;
+  padding: 18px;
+  margin: auto;
+}
+.dashboard-page .dashboard-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 2.15fr) minmax(270px, 1fr);
+  gap: 18px;
+}
+.dashboard-page .dashboard-primary,
+.dashboard-page .dashboard-sidebar {
+  display: grid;
+  align-content: start;
+  gap: 17px;
+  min-width: 0;
+}
+.dashboard-page .featured-game {
+  min-height: 310px;
+  border-radius: 16px;
+  padding: 24px;
+  color: white;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 85% 20%,#d9774a66,transparent 42%),
+    linear-gradient(105deg,#22000dec,#4b0a24dd 52%,#21030cb0),
+    linear-gradient(160deg,#66132c,#1d1721);
+  box-shadow: 0 5px 15px #0002;
+}
+.dashboard-page .feature-label {
+  font-size: 21px;
+  font-weight: 900;
+  color: #f5c873;
+}
+.dashboard-page .featured-content {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+  margin-top: 22px;
+}
+.dashboard-page .feature-bc {
+  color: #eabf6e;
+  font-size: clamp(48px,8vw,95px);
+  font-weight: 1000;
+  font-style: italic;
+  text-shadow: 3px 3px #000;
+}
+.dashboard-page .feature-sport {
+  color: #e9bd69;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+.dashboard-page .feature-details h2 {
+  font-size: clamp(25px,3vw,40px);
+  color: white;
+  line-height: 1.1;
+  margin: 8px 0 15px;
+}
+.dashboard-page .feature-details p { color: white; margin: 8px 0; }
+.dashboard-page .gold-action {
+  display: inline-block;
+  background: #efbf64;
+  color: #3b0717;
+  text-decoration: none;
+  border-radius: 9px;
+  padding: 12px 20px;
+  font-weight: 900;
+  margin-top: 14px;
+}
+.dashboard-page .dashboard-panel {
+  border-radius: 15px;
+  background: white;
+  box-shadow: 0 3px 13px #0000000b;
+  padding: 15px;
+  min-width: 0;
+}
+.dashboard-page .panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+.dashboard-page .panel-heading h2 {
+  margin: 0;
+  font-size: 19px;
+  color: #191c2b;
+  font-weight: 900;
+}
+.dashboard-page .text-action {
+  background: transparent;
+  border: 0;
+  color: #8b0028;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+}
+.dashboard-page .sport-tiles {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 9px;
+}
+.dashboard-page .dashboard-sport-tile {
+  min-height: 105px;
+  background: linear-gradient(145deg,#90002b,#330014);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  cursor: pointer;
+  font-weight: 800;
+  text-align: center;
+}
+.dashboard-page .dashboard-sport-tile:nth-child(3n+2) {
+  background: linear-gradient(145deg,#28334a,#111827);
+}
+.dashboard-page .dashboard-sport-tile:hover {
+  border-color: #efc16c;
+  transform: translateY(-2px);
+}
+.dashboard-page .tile-icon { font-size: 34px; }
+.dashboard-page .dashboard-sport-tile strong { font-size: 12px; }
+.dashboard-page .dashboard-status {
+  font-size: 12px;
+  color: #6c6d77;
+  margin-bottom: 8px;
+}
+.dashboard-page .upcoming-list { display: grid; gap: 7px; }
+.dashboard-page .dashboard-game-row {
+  display: grid;
+  grid-template-columns: 75px 40px minmax(130px,1fr) 105px minmax(100px,.8fr) 85px;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #202235;
+  background: #fafafb;
+  border: 1px solid #eeeef1;
+  border-radius: 10px;
+  padding: 9px;
+}
+.dashboard-page .dashboard-game-row:hover {
+  border-color: #9a1641;
+  background: #fff8f9;
+}
+.dashboard-page .game-date-box {
+  background: #79001e;
+  color: white;
+  border-radius: 8px;
+  padding: 12px 5px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 900;
+}
+.dashboard-page .game-sport-icon { font-size: 27px; text-align: center; }
+.dashboard-page .game-row-details strong {
+  font-size: 10px;
+  color: #6d1430;
+}
+.dashboard-page .game-row-opponent { font-size: 15px; font-weight: 800; }
+.dashboard-page .game-row-time,
+.dashboard-page .game-row-venue { font-size: 12px; }
+.dashboard-page .game-row-action {
+  border: 1px solid #a51442;
+  color: #8d0029;
+  padding: 9px 6px;
+  border-radius: 7px;
+  font-size: 11px;
+  text-align: center;
+  font-weight: 900;
+}
+.dashboard-page .refresh-action {
+  display: block;
+  margin: 12px auto 0;
+  border: 0;
+  background: transparent;
+  color: #8b0028;
+  font-weight: 800;
+  cursor: pointer;
+}
+.dashboard-page .live-panel {
+  background: linear-gradient(145deg,#142238,#070d18);
+  color: white;
+  border-radius: 15px;
+  padding: 20px;
+}
+.dashboard-page .live-panel .panel-heading h2 { color: white; }
+.dashboard-page .live-empty {
+  text-align: center;
+  padding: 35px 10px;
+}
+.dashboard-page .live-symbol {
+  font-size: 45px;
+  color: #ee315c;
+  margin-bottom: 15px;
+}
+.dashboard-page .live-empty p {
+  color: #b8c2d1;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.dashboard-page .recent-list { font-size: 14px; color: #666b78; }
+.dashboard-page .sidebar-about {
+  background: linear-gradient(135deg,#77001e,#440015);
+  color: white;
+}
+.dashboard-page .sidebar-about h2 { color: #efc16c; }
+.dashboard-page .sidebar-about p { color: white; }
+.dashboard-page .source-note { font-size: 12px; opacity: .7; }
+.dashboard-page .full-schedule[hidden] { display: none !important; }
+.dashboard-page .full-schedule select {
+  margin: 10px 0 16px;
+  max-width: 330px;
+}
+.dashboard-page #alerts[hidden] { display: none !important; }
+.dashboard-page #alerts.alert-dropdown {
+  position: fixed;
+  z-index: 600;
+  top: 224px;
+  right: 22px;
+  width: min(350px,calc(100vw - 24px));
+  max-height: calc(100dvh - 245px);
+  overflow-y: auto;
+  padding: 16px;
+  background: white;
+  color: #222;
+  border: 1px solid #e2d3b6;
+  border-radius: 13px;
+  box-shadow: 0 15px 50px #0004;
+}
+.dashboard-page #alerts h2 { font-size: 18px; margin: 0 0 14px; }
+.dashboard-page #alerts .alert-settings {
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.dashboard-page #alerts .test-score {
+  background: #f0c16a;
+  color: #380013;
+  border: 0;
+  border-radius: 9px;
+  font-weight: 900;
+  padding: 13px;
+}
+@media(max-width: 1050px) {
+  .dashboard-page .dashboard-columns { grid-template-columns: 1fr; }
+  .dashboard-page .dashboard-game-row {
+    grid-template-columns: 75px 36px minmax(0,1fr) 85px;
+  }
+  .dashboard-page .game-row-venue,
+  .dashboard-page .game-row-action { display: none; }
+}
+@media(max-width: 650px) {
+  .dashboard-page .eagles-banner { min-height: 125px; padding: 20px 13px; }
+  .dashboard-page .banner-content { gap: 12px; }
+  .dashboard-page .banner-monogram {
+    font-size: 40px; letter-spacing: -7px;
+  }
+  .dashboard-page .banner-title h1 { font-size: 30px; }
+  .dashboard-page .banner-title span { font-size: 11px; letter-spacing: 1px; }
+  .dashboard-page .banner-motto { font-size: 16px; }
+  .dashboard-page .eagles-nav {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 7px;
+  }
+  .dashboard-page .eagles-nav a,
+  .dashboard-page .eagles-nav button { font-size: 12px; padding: 10px; }
+  .dashboard-page .dashboard-main { padding: 10px; }
+  .dashboard-page .featured-game { padding: 18px; min-height: 260px; }
+  .dashboard-page .feature-bc { font-size: 47px; }
+  .dashboard-page .featured-content { gap: 12px; }
+  .dashboard-page .feature-details h2 { font-size: 24px; }
+  .dashboard-page .sport-tiles { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .dashboard-page .dashboard-game-row {
+    grid-template-columns: 65px 30px minmax(0,1fr);
+    gap: 8px;
+  }
+  .dashboard-page .game-row-time { grid-column: 3; }
+  .dashboard-page #alerts.alert-dropdown {
+    top: 175px;
+    right: 12px;
+    max-height: calc(100dvh - 190px);
+  }
+}
+
+
+/* EAGLES LIVE PHOTOGRAPHY UPGRADE */
+
+/* Actual Alumni Stadium and Gasson Hall photography */
+.dashboard-page .eagles-banner {
+  min-height: 205px;
+  background:
+    linear-gradient(90deg,
+      rgba(35,0,13,.92) 0%,
+      rgba(48,0,18,.48) 48%,
+      rgba(35,0,13,.40) 75%,
+      rgba(35,0,13,.88) 100%),
+    url('/static/assets/gasson-hall.jpg') right center / 34% auto no-repeat,
+    url('/static/assets/alumni-stadium.jpg') center 53% / cover no-repeat,
+    #570019;
+  display: flex;
+  align-items: center;
+}
+.dashboard-page .banner-content {
+  width: 100%;
+}
+.dashboard-page .banner-title h1 {
+  text-shadow: 2px 4px 12px #16000d;
+}
+.dashboard-page .banner-motto {
+  text-shadow: 2px 3px 10px #16000d;
+}
+.dashboard-page .featured-game {
+  min-height: 350px;
+  background:
+    linear-gradient(90deg,
+      rgba(22,0,9,.94) 0%,
+      rgba(35,0,13,.85) 43%,
+      rgba(35,0,13,.18) 100%),
+    url('/static/assets/alumni-stadium.jpg') center / cover,
+    #450017;
+}
+.dashboard-page .featured-content {
+  min-height: 245px;
+}
+.dashboard-page .feature-bc {
+  color: #f1c36c;
+  -webkit-text-stroke: 1px white;
+  filter: drop-shadow(3px 5px 3px #000);
+}
+.dashboard-page .dashboard-sport-tile {
+  position: relative;
+  overflow: hidden;
+  min-height: 138px;
+  isolation: isolate;
+  background:
+    linear-gradient(0deg,rgba(25,0,12,.94),rgba(85,0,32,.35)),
+    url('/static/assets/alumni-stadium.jpg') center / cover;
+  box-shadow: inset 0 0 0 1px #ffffff20;
+}
+.dashboard-page .dashboard-sport-tile:nth-child(3n+2) {
+  background:
+    linear-gradient(0deg,rgba(7,17,34,.96),rgba(7,17,34,.35)),
+    url('/static/assets/alumni-stadium.jpg') center / cover;
+}
+.dashboard-page .dashboard-sport-tile:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 6px 18px #0003;
+}
+.dashboard-page .tile-icon {
+  font-size: 42px;
+  filter: drop-shadow(0 2px 4px #000);
+}
+.dashboard-page .dashboard-sport-tile strong {
+  color: white;
+  font-size: 13px;
+  text-shadow: 0 2px 5px black;
+}
+.dashboard-page .live-panel {
+  background:
+    linear-gradient(180deg,rgba(5,13,25,.90),rgba(5,13,25,.72)),
+    url('/static/assets/alumni-stadium.jpg') center / cover,
+    #0b1423;
+}
+.dashboard-page .dashboard-panel {
+  border: 1px solid #e8e8ed;
+}
+.dashboard-page .game-date-box {
+  background: linear-gradient(145deg,#97002e,#610019);
+}
+.dashboard-page .dashboard-game-row:hover {
+  transform: translateX(2px);
+}
+.dashboard-page .photo-credits {
+  font-size: 11px;
+  text-align: center;
+  color: #777;
+  padding: 12px;
+}
+.dashboard-page .photo-credits a {
+  color: #760027;
+}
+@media(max-width:650px) {
+  .dashboard-page .eagles-banner {
+    min-height: 150px;
+    background:
+      linear-gradient(90deg,rgba(35,0,13,.88),rgba(35,0,13,.35)),
+      url('/static/assets/alumni-stadium.jpg') center / cover,
+      #570019;
+  }
+  .dashboard-page .featured-game {
+    min-height: 295px;
+  }
+  .dashboard-page .dashboard-sport-tile {
+    min-height: 115px;
+  }
+}
+
+
+/* REAL BC EAGLES LOGO */
+.actual-bc-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 140px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.4));
+}
+
+.banner-monogram,
+.feature-bc {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+
+
+/* GAMES THIS WEEK IS THE HOMEPAGE HERO */
+.featured-game {
+  display: none !important;
+}
+
+.dashboard-main,
+.dashboard-columns,
+.dashboard-primary,
+.main-column {
+  display: flex;
+  flex-direction: column;
+}
+
+#upcoming,
+#games-panel,
+.dashboard-games-panel {
+  order: -100;
+}
+
+#upcoming,
+#games-panel,
+.dashboard-games-panel {
+  width: 100%;
+}
+
+
+
+/* CONTE FORUM PHOTO TILES V1 */
+
+.dashboard-sport-tile,
+.sport-tile {
+    position: relative !important;
+    isolation: isolate;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    color: white !important;
+    text-shadow: 0 2px 5px rgba(0,0,0,.9);
+    overflow: hidden;
+}
+
+.dashboard-sport-tile::before,
+.sport-tile::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        0deg,
+        rgba(25,0,10,.88),
+        rgba(25,0,10,.05) 80%
+    );
+    z-index: -1;
+    pointer-events: none;
+}
+
+.dashboard-sport-tile strong,
+.sport-tile strong {
+    position: relative;
+    z-index: 2;
+    font-weight: 900;
+    letter-spacing: .4px;
+}
+
+/* Hide old emoji artwork when wrapped in icon elements */
+.sport-emoji,
+.dashboard-sport-tile .sport-icon {
+    display: none !important;
+}
+
+
+/* BC PREMIUM VISUAL REFRESH V46 */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bc-maroon: #790A30;
+  --bc-deep: #350014;
+  --bc-gold: #C8A45D;
+}
+
+body {
+  font-family: 'Inter', Arial, sans-serif !important;
+  letter-spacing: -0.015em;
+}
+
+h1, h2, h3,
+.section-title,
+.section-heading,
+.sport-name,
+.game-title,
+.nav-brand {
+  font-family: 'Barlow Condensed', Impact, sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: .035em !important;
+}
+
+h1, h2, .section-title, .section-heading {
+  text-transform: uppercase;
+}
+
+.masthead,
+.site-header,
+.hero-banner {
+  background-color: var(--bc-deep);
+  background-image:
+    linear-gradient(90deg,
+      rgba(35,0,15,.93) 0%,
+      rgba(53,0,20,.75) 40%,
+      rgba(53,0,20,.24) 100%),
+    url('/static/assets/alumni-stadium.jpg') !important;
+  background-size: cover !important;
+  background-position: center 45% !important;
+}
+
+nav a,
+.navbar a,
+.main-nav a {
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: .025em;
+}
+
+.game-row,
+.game-card,
+.sport-tile,
+.dashboard-sport-tile {
+  border-radius: 10px;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.game-card:hover,
+.sport-tile:hover,
+.dashboard-sport-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(35,0,15,.18);
+}
+
+button {
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 700;
+}
+
+
+
+/* BC MASTHEAD TYPOGRAPHY V49 */
+
+:root {
+  --bc-display-font: 'Barlow Condensed', Impact, sans-serif;
+  --bc-motto-font: 'Cinzel', Georgia, serif;
+  --bc-ui-font: 'Inter', Arial, sans-serif;
+}
+
+/* Main site name */
+.banner-title,
+.brand-title,
+.site-title,
+.masthead h1,
+.site-header h1,
+.hero-banner h1 {
+  font-family: var(--bc-display-font) !important;
+  font-weight: 900 !important;
+  font-size: clamp(2.5rem, 5vw, 5rem) !important;
+  line-height: .92 !important;
+  letter-spacing: .035em !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 3px 14px rgba(0,0,0,.5);
+}
+
+/* Boston College motto */
+.banner-motto,
+.masthead-motto,
+.site-motto,
+.tagline,
+.masthead .subtitle,
+.hero-banner .subtitle {
+  font-family: var(--bc-motto-font) !important;
+  font-weight: 700 !important;
+  font-size: clamp(.85rem, 1.45vw, 1.3rem) !important;
+  line-height: 1.4 !important;
+  letter-spacing: .24em !important;
+  text-transform: uppercase !important;
+  color: #E8CB8C !important;
+  text-shadow: 0 2px 7px rgba(0,0,0,.65);
+}
+
+/* Navigation */
+nav,
+nav a,
+.main-nav,
+.main-nav a,
+.navbar,
+.navbar a {
+  font-family: var(--bc-ui-font) !important;
+  font-weight: 700 !important;
+  letter-spacing: .045em !important;
+  text-transform: uppercase !important;
+}
+
+/* Sports section headlines */
+.section-title,
+.section-heading,
+.panel-title,
+.sports-heading {
+  font-family: var(--bc-display-font) !important;
+  font-size: clamp(1.5rem, 2.5vw, 2.25rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+}
+
+/* Small accent under the motto */
+.banner-motto::after,
+.masthead-motto::after,
+.site-motto::after {
+  content: '';
+  display: block;
+  width: 72px;
+  height: 2px;
+  margin-top: 12px;
+  background: #C8A45D;
+}
+
+
+
+
+
+/* BC CLEAN SPORTS BROADCAST BANNER V56 */
+
+.banner-title,
+.brand-title,
+.site-title,
+.masthead h1,
+.site-header h1,
+.hero-banner h1 {
+    font-family: 'Barlow Condensed', Impact, sans-serif !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    font-size: clamp(42px, 6vw, 88px) !important;
+    letter-spacing: -.025em !important;
+    line-height: 1 !important;
+    color: #ffffff !important;
+    -webkit-text-stroke: 0 !important;
+    text-shadow: 0 3px 12px rgba(0,0,0,.65) !important;
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.banner-motto,
+.masthead-motto,
+.site-motto,
+.masthead .subtitle,
+.hero-banner .subtitle {
+    font-family: 'Inter', Arial, sans-serif !important;
+    font-weight: 800 !important;
+    font-size: clamp(12px, 1.4vw, 17px) !important;
+    letter-spacing: .22em !important;
+    color: #e7c478 !important;
+    text-transform: uppercase !important;
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,.7) !important;
+}
+
+.banner-motto::after,
+.masthead-motto::after,
+.site-motto::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Remove decorative stripe effects from banner headings */
+.masthead h1::before,
+.masthead h1::after,
+.hero-banner h1::before,
+.hero-banner h1::after,
+.banner-title::before,
+.banner-title::after {
+    display: none !important;
+    content: none !important;
+}
+
+
+
+/* ACTUAL BC BANNER REDESIGN V57 */
+
+.dashboard-page .eagles-banner {
+    min-height: 230px !important;
+    padding: 30px 5% !important;
+    background:
+      linear-gradient(90deg,
+        rgba(30,0,12,.96) 0%,
+        rgba(45,0,18,.78) 38%,
+        rgba(35,0,15,.22) 76%,
+        rgba(30,0,12,.55) 100%),
+      url('/static/assets/alumni-stadium.jpg') center 48% / cover no-repeat !important;
+}
+
+.dashboard-page .banner-title h1 {
+    font-family: 'Barlow Condensed', Impact, sans-serif !important;
+    font-size: clamp(48px, 7vw, 105px) !important;
+    font-weight: 900 !important;
+    font-style: italic !important;
+    letter-spacing: -.045em !important;
+    line-height: .88 !important;
+    text-transform: uppercase !important;
+    color: #fff8e9 !important;
+    text-shadow:
+      3px 4px 0 #61001e,
+      6px 7px 0 #29000e,
+      10px 12px 20px rgba(0,0,0,.65) !important;
+}
+
+.dashboard-page .banner-title span {
+    font-family: 'Barlow Condensed', Impact, sans-serif !important;
+    font-size: clamp(16px, 2.3vw, 26px) !important;
+    font-weight: 800 !important;
+    letter-spacing: .18em !important;
+    color: #e8c16e !important;
+}
+
+.dashboard-page .banner-motto {
+    font-family: 'Barlow Condensed', Impact, sans-serif !important;
+    font-size: clamp(24px, 3.5vw, 48px) !important;
+    font-weight: 900 !important;
+    font-style: italic !important;
+    letter-spacing: -.025em !important;
+    color: #f3ce7b !important;
+    transform: rotate(-5deg) !important;
+    border: 0 !important;
+    text-shadow: 3px 4px 10px #21000c !important;
+}
+
+.dashboard-page .banner-motto::before,
+.dashboard-page .banner-motto::after,
+.dashboard-page .stadium-art {
+    display: none !important;
+    content: none !important;
+}
+
+@media (max-width:650px) {
+  .dashboard-page .eagles-banner {
+    min-height: 165px !important;
+    padding: 20px 14px !important;
+  }
+  .dashboard-page .banner-title h1 {
+    font-size: clamp(32px, 8vw, 52px) !important;
+  }
+  .dashboard-page .banner-motto {
+    font-size: 18px !important;
+    transform: none !important;
+  }
+}
+
+
+
+/* BC STADIUM + GASSON BANNER V58 */
+
+.dashboard-page .eagles-banner {
+  position: relative !important;
+  isolation: isolate;
+  background:
+    linear-gradient(90deg,
+      rgba(35,0,14,.94) 0%,
+      rgba(45,0,17,.70) 38%,
+      rgba(45,0,17,.20) 67%,
+      rgba(35,0,14,.68) 100%),
+    url('/static/assets/gasson-hall.jpg') right center / 34% auto no-repeat,
+    url('/static/assets/alumni-stadium-packed.jpg') center 48% / cover no-repeat,
+    #450014 !important;
+}
+
+.dashboard-page .banner-content {
+  position: relative;
+  z-index: 2;
+}
+
+.dashboard-page .stadium-art {
+  display: none !important;
+}
+
+@media (max-width: 650px) {
+  .dashboard-page .eagles-banner {
+    background:
+      linear-gradient(90deg,rgba(35,0,14,.9),rgba(35,0,14,.4)),
+      url('/static/assets/alumni-stadium-packed.jpg') center / cover no-repeat,
+      #450014 !important;
+  }
+}
+
+
+
+/* BC SEAMLESS PANORAMIC BANNER V60 */
+
+.dashboard-page .eagles-banner {
+  min-height: 245px !important;
+  background:
+    linear-gradient(90deg,
+      rgba(30,0,12,.85) 0%,
+      rgba(30,0,12,.48) 36%,
+      rgba(30,0,12,.08) 68%,
+      rgba(30,0,12,.16) 100%),
+    url('/static/assets/bc-banner-blended.png') center 50% / cover no-repeat !important;
+}
+
+.dashboard-page .stadium-art {
+  display: none !important;
+}
+
+@media (max-width: 650px) {
+  .dashboard-page .eagles-banner {
+    min-height: 180px !important;
+    background-position: 50% center !important;
+  }
+}
+
+
+
+/* BC SCRIPT MOTTO V61 */
+
+.dashboard-page .banner-motto {
+  font-family: 'Yellowtail', 'Brush Script MT', cursive !important;
+  font-size: clamp(32px, 4.2vw, 66px) !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+  line-height: 1.15 !important;
+  text-transform: none !important;
+  color: #f5d28a !important;
+  transform: rotate(-5deg) !important;
+  white-space: nowrap;
+  text-shadow:
+    2px 3px 0 #4b0019,
+    4px 6px 0 #25000c,
+    6px 9px 14px rgba(0,0,0,.7),
+    0 0 18px rgba(255,210,115,.18) !important;
+  border: none !important;
+  background: none !important;
+}
+
+.dashboard-page .banner-motto::before,
+.dashboard-page .banner-motto::after {
+  display: none !important;
+  content: none !important;
+}
+
+@media (max-width: 650px) {
+  .dashboard-page .banner-motto {
+    font-size: clamp(24px, 6vw, 38px) !important;
+    transform: rotate(-3deg) !important;
+    white-space: normal;
+  }
+}
+
+
+
+/* BC BOLD CALLIGRAPHY MOTTO V62 */
+
+.dashboard-page .banner-motto {
+  font-family: 'Pirata One', Georgia, serif !important;
+  font-size: clamp(34px, 4.3vw, 68px) !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  letter-spacing: .025em !important;
+  line-height: 1.05 !important;
+  text-transform: none !important;
+  color: #f1cc7b !important;
+  transform: rotate(-3deg) !important;
+  white-space: nowrap;
+  text-shadow:
+    2px 3px 0 #5b001f,
+    4px 6px 0 #28000f,
+    6px 9px 14px rgba(0,0,0,.72) !important;
+  border: none !important;
+  background: none !important;
+}
+
+.dashboard-page .banner-motto::before,
+.dashboard-page .banner-motto::after {
+  display: none !important;
+  content: none !important;
+}
+
+@media (max-width: 650px) {
+  .dashboard-page .banner-motto {
+    font-size: clamp(23px, 6vw, 38px) !important;
+    transform: rotate(-2deg) !important;
+    white-space: normal;
+  }
+}
+
+
+
+/* BC STYLE SCRIPT MOTTO V65 */
+
+.dashboard-page .banner-motto {
+  font-family: 'Style Script', cursive !important;
+  font-size: clamp(38px, 4.5vw, 72px) !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+  line-height: 1.2 !important;
+  text-transform: none !important;
+  color: #f5d28a !important;
+  transform: rotate(-3deg) !important;
+  text-shadow:
+    2px 3px 0 #57001c,
+    4px 6px 0 #26000e,
+    6px 9px 15px rgba(0,0,0,.7) !important;
+  border: none !important;
+  background: none !important;
+}
+
+.dashboard-page .banner-motto::before,
+.dashboard-page .banner-motto::after {
+  display: none !important;
+  content: none !important;
+}
+
+@media (max-width: 650px) {
+  .dashboard-page .banner-motto {
+    font-size: clamp(27px, 6vw, 42px) !important;
+    transform: rotate(-2deg) !important;
+  }
+}
+
+
+/* BC MOTTO POSITION V66 — shift left toward Gasson Hall tower */
+@media (min-width: 651px) {
+  .dashboard-page .banner-motto {
+    position: relative !important;
+    left: -75px !important;
+  }
+}
+
+@media (max-width: 650px) {
+  .dashboard-page .banner-motto {
+    left: 0 !important;
+  }
+}
+
+/* BC FOOTBALL ACTION TILE V67 */
+.dashboard-page .dashboard-sport-tile.bc-football-action-photo {
+  background-image:
+    linear-gradient(0deg, rgba(30,0,12,.80), rgba(30,0,12,0) 65%),
+    url('/static/assets/bc-football-action.jpg') !important;
+  background-position: center 35% !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+}
+
+
+/* BC LIVE BOARD 109 */
+.bc-live-board {
+  margin: 12px 0 18px;
+  padding: 18px;
+  background: #fff;
+  border: 2px solid #8a1538;
+  border-radius: 12px;
+  color: #242424;
+}
+.bc-live-board h3 {
+  margin: 0 0 12px;
+  color: #8a1538;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+.bc-live-matchup {
+  display: grid;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 800;
+}
+.bc-live-status {
+  margin: 14px 0 8px;
+  color: #8a1538;
+  font-weight: 800;
+}
+.bc-live-board small {
+  color: #666;
+}
+
+
+/* BC SOCCER LIVE 111 */
+.bc-soccer-live {
+  margin: 12px 0 18px;
+  padding: 18px;
+  border: 2px solid #8a1538;
+  border-radius: 12px;
+  background: #fff;
+  color: #242424;
+}
+.bc-soccer-live[hidden] {
+  display: none;
+}
+.bc-soccer-live h3 {
+  margin: 0 0 12px;
+  color: #8a1538;
+  font-size: 14px;
+}
+.bc-soccer-score {
+  font-size: 22px;
+  font-weight: 900;
+}
+.bc-soccer-status {
+  margin: 12px 0;
+  font-weight: 900;
+  color: #8a1538;
+}
+.bc-soccer-live small {
+  color: #666;
+}
+
+
+/* GAME CENTER 112 */
+.bc-game-center {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0 18px;
+}
+.gc-card {
+  border: 2px solid #8a1538;
+  border-radius: 12px;
+  background: white;
+  overflow: hidden;
+  color: #242424;
+}
+.gc-summary { padding: 14px 16px; }
+.gc-sport {
+  font-size: 12px;
+  font-weight: 900;
+  color: #8a1538;
+  margin-bottom: 9px;
+}
+.gc-scoreline {
+  display: flex;
+  justify-content: space-between;
+  white-space: pre-wrap;
+  font-size: 18px;
+  font-weight: 900;
+  margin: 6px 0;
+}
+.gc-status {
+  margin-top: 10px;
+  color: #8a1538;
+  font-weight: 800;
+  font-size: 12px;
+}
+.gc-expand {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid #ddd;
+  padding: 11px;
+  background: #f8f4f5;
+  color: #8a1538;
+  font-weight: 900;
+  cursor: pointer;
+}
+.gc-details {
+  padding: 14px;
+  border-top: 1px solid #ddd;
+}
+.gc-details[hidden] { display: none; }
+.gc-tabs, .gc-team-toggle {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.gc-tabs button, .gc-team-toggle button {
+  border: 1px solid #b7a4aa;
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: white;
+  color: #8a1538;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.gc-tabs button.active, .gc-team-toggle button.active {
+  background: #8a1538;
+  color: white;
+}
+.gc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.gc-table th, .gc-table td {
+  padding: 8px 5px;
+  border-bottom: 1px solid #eee;
+  text-align: right;
+}
+.gc-table th:first-child, .gc-table td:first-child {
+  text-align: left;
+}
+.gc-empty, .gc-warning {
+  font-size: 12px;
+  color: #666;
+  padding: 10px;
+}
+.gc-warning { color: #8a1538; }
+.gc-player-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+}
+.gc-play {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+}
+
+/* STEP 114 — COMPACT MOBILE HEADER */
+/* Placed at the end to override earlier header rules. */
+
+@media screen and (max-width: 650px) {
+
+  .dashboard-page .eagles-banner {
+    min-height: 88px;
+    height: auto;
+    padding: 10px 13px;
+  }
+
+  .dashboard-page .banner-content {
+    min-height: 68px;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .dashboard-page .banner-monogram {
+    font-size: 30px;
+    letter-spacing: normal;
+    padding-right: 0;
+    flex-shrink: 0;
+  }
+
+  .dashboard-page .actual-bc-logo {
+    width: 65px;
+    max-width: 65px;
+    height: auto;
+    max-height: 65px;
+    object-fit: contain;
+  }
+
+  .dashboard-page .banner-title h1 {
+    font-size: clamp(23px, 6vw, 30px);
+    line-height: 1;
+    margin: 0;
+  }
+
+  .dashboard-page .banner-title span {
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+
+  .dashboard-page .banner-motto {
+    font-size: 12px;
+    line-height: 1.1;
+  }
+}
+
+@media screen and (max-width: 380px) {
+
+  .dashboard-page .actual-bc-logo {
+    width: 52px;
+    max-width: 52px;
+    max-height: 52px;
+  }
+
+  .dashboard-page .banner-title h1 {
+    font-size: 22px;
+  }
+
+  .dashboard-page .banner-motto {
+    font-size: 10px;
+  }
+}
+
+/* STEP 116 — FINAL MOBILE HEADER OVERRIDE */
+
+@media screen and (max-width: 650px) {
+
+  body.dashboard-page .eagles-banner {
+    min-height: 90px !important;
+    height: 90px !important;
+    max-height: 90px !important;
+    padding: 8px 12px !important;
+  }
+
+  body.dashboard-page .banner-content {
+    min-height: 0 !important;
+    height: 74px !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  body.dashboard-page .banner-monogram {
+    font-size: 30px !important;
+    letter-spacing: 0 !important;
+    padding-right: 0 !important;
+    flex-shrink: 0;
+  }
+
+  body.dashboard-page .actual-bc-logo {
+    width: 62px !important;
+    max-width: 62px !important;
+    height: 62px !important;
+    max-height: 62px !important;
+    object-fit: contain;
+  }
+
+  body.dashboard-page .banner-title h1 {
+    font-size: 26px !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+  }
+
+  body.dashboard-page .banner-title span {
+    font-size: 9px !important;
+    letter-spacing: 1px !important;
+  }
+
+  body.dashboard-page .banner-motto {
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+  }
+}
+
+@media screen and (max-width: 380px) {
+
+  body.dashboard-page .actual-bc-logo {
+    width: 52px !important;
+    max-width: 52px !important;
+    height: 52px !important;
+    max-height: 52px !important;
+  }
+
+  body.dashboard-page .banner-title h1 {
+    font-size: 22px !important;
+  }
+}
+
+/* STEP 117 — MOBILE MOTTO POSITION */
+
+@media screen and (max-width: 650px) {
+
+  body.dashboard-page .banner-content {
+    position: relative !important;
+  }
+
+  body.dashboard-page .banner-motto {
+    position: absolute !important;
+    right: 14px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+
+    font-size: 21px !important;
+    line-height: 0.95 !important;
+    text-align: center !important;
+
+    white-space: nowrap !important;
+    z-index: 5 !important;
+  }
+}
+
+@media screen and (max-width: 380px) {
+
+  body.dashboard-page .banner-motto {
+    right: 8px !important;
+    font-size: 18px !important;
+  }
+}
+
+/* STEP 118 — MOTTO OVER GASSON TOWER */
+
+@media screen and (max-width: 650px) {
+
+  body.dashboard-page .banner-content {
+    position: static !important;
+  }
+
+  body.dashboard-page .banner-motto {
+    position: absolute !important;
+
+    /* Position relative to the full header */
+    left: auto !important;
+    right: 8% !important;
+    top: 50% !important;
+
+    transform: translateY(-50%) !important;
+
+    font-size: 22px !important;
+    line-height: 0.95 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+
+    z-index: 10 !important;
+  }
+}
+
+@media screen and (max-width: 380px) {
+
+  body.dashboard-page .banner-motto {
+    right: 5% !important;
+    font-size: 19px !important;
+  }
+}
+
+/* STEP 119 — OFFICIAL BC ROSTERS */
+
+.bc-roster-button,
+.bc-live-roster-button {
+  background: #780020;
+  color: #fff;
+  border: 1px solid #c5a15a;
+  border-radius: 5px;
+  padding: 8px 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.bc-roster-button[hidden],
+.bc-live-roster-button[hidden],
+.bc-roster-overlay[hidden] {
+  display: none !important;
+}
+
+.bc-roster-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(15, 0, 7, .82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.bc-roster-dialog {
+  width: min(760px, 100%);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 3px solid #bd9853;
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.bc-roster-heading {
+  background: #65001d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 17px;
+}
+
+.bc-roster-heading h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.bc-roster-close {
+  background: transparent;
+  border: 0;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.bc-roster-body {
+  padding: 12px;
+  overflow: auto;
+}
+
+.bc-roster-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.bc-roster-table th {
+  background: #f1e7d7;
+  color: #540018;
+  text-align: left;
+  padding: 10px 7px;
+}
+
+.bc-roster-table td {
+  padding: 10px 7px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.bc-roster-table tbody tr:nth-child(even) {
+  background: #faf6f1;
+}
+
+.bc-roster-table th:first-child,
+.bc-roster-table td:first-child {
+  width: 42px;
+}
+
+.bc-roster-source {
+  display: inline-block;
+  margin-top: 14px;
+  color: #65001d;
+  font-weight: 700;
+}
+
+@media (max-width: 650px) {
+  .bc-roster-dialog {
+    max-height: 88vh;
+  }
+
+  .bc-roster-table {
+    font-size: 12px;
+  }
+
+  .bc-roster-table td,
+  .bc-roster-table th {
+    padding: 9px 4px;
+  }
+
+  .bc-roster-heading h2 {
+    font-size: 16px;
+  }
+}
+
+
+/* BC FAVORITES 129 */
+.bc-fav-wrap { position:relative; min-width:0; }
+.bc-fav-wrap > .dashboard-sport-tile { width:100%; height:100%; }
+.bc-fav-star {
+  position:absolute;
+  top:6px;
+  right:6px;
+  z-index:4;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:1px solid #b99c68;
+  background:#fff;
+  color:#790024;
+  font-size:23px;
+  cursor:pointer;
+}
+.bc-fav-star.active {
+  background:#fff4d6;
+  color:#bc8c19;
+  border-color:#bc8c19;
+}
+.bc-fav-toolbar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:10px 12px;
+  margin-bottom:10px;
+  background:#f7f0e5;
+  border-left:4px solid #bc8c19;
+  color:#67001e;
+  font-weight:800;
+  font-size:13px;
+}
+#bc-fav-toggle {
+  padding:8px 12px;
+  border:0;
+  border-radius:5px;
+  background:#740023;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
+#bc-fav-toggle[hidden] { display:none!important; }
+
+/* STEP 131 — PERFECTLY CENTER FAVORITE STARS */
+.bc-fav-star,
+.bc-favorite-star {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+}
+
+
+/* BC GAME PREVIEWS — STEP 134 */
+.bc-preview-overlay[hidden] { display:none!important; }
+.bc-preview-overlay {
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.bc-preview-backdrop {
+  position:absolute;
+  inset:0;
+  background:rgba(12,15,24,.74);
+}
+.bc-preview-sheet {
+  position:relative;
+  width:min(680px,95vw);
+  max-height:90dvh;
+  background:#fff;
+  color:#24242b;
+  border-radius:16px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 20px 65px rgba(0,0,0,.3);
+}
+.bc-preview-topbar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 18px;
+  background:#750023;
+  color:white;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.bc-preview-close {
+  border:0;
+  background:transparent;
+  color:white;
+  font-size:22px;
+  cursor:pointer;
+}
+.bc-preview-body { overflow-y:auto; padding:22px; }
+.bc-preview-heading { margin-bottom:20px; }
+.bc-preview-kicker {
+  color:#8a1538;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.bc-preview-heading h2 {
+  margin:6px 0;
+  color:#67001e;
+  font-size:27px;
+}
+.bc-preview-heading p { margin:0; color:#60616a; }
+.bc-preview-metrics {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+.bc-preview-metric {
+  background:#f5f0eb;
+  border-radius:9px;
+  padding:13px 6px;
+  text-align:center;
+}
+.bc-preview-metric small,
+.bc-preview-info small {
+  display:block;
+  color:#777;
+  font-size:10px;
+  font-weight:800;
+}
+.bc-preview-metric strong {
+  display:block;
+  font-size:23px;
+  color:#67001e;
+  margin-top:4px;
+}
+.bc-preview-section-title {
+  margin:24px 0 10px;
+  font-size:15px;
+  color:#67001e;
+}
+.bc-preview-schedule { display:grid; gap:5px; }
+.bc-preview-button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#790024;
+  color:white;
+  border:0;
+  border-radius:8px;
+  padding:12px 15px;
+  font-size:13px;
+  font-weight:800;
+  text-decoration:none;
+  cursor:pointer;
+}
+.bc-preview-button.secondary {
+  background:#f0e8e8;
+  color:#750023;
+}
+.bc-preview-game {
+  display:grid;
+  grid-template-columns:62px minmax(0,1fr) auto;
+  gap:10px;
+  text-align:left;
+  align-items:center;
+  width:100%;
+  background:#f7f7f8;
+  color:#292932;
+  border:1px solid #e5e5e8;
+}
+.bc-preview-game-date { font-size:12px; color:#777; }
+.bc-preview-game-opponent { font-weight:800; }
+.bc-preview-game-result { font-size:12px; white-space:nowrap; }
+.bc-preview-game-result.win { color:#137747; font-weight:900; }
+.bc-preview-game-result.loss { color:#a32935; font-weight:900; }
+.bc-preview-next {
+  width:100%;
+  text-align:left;
+  justify-content:flex-start;
+  line-height:1.5;
+}
+.bc-preview-matchup {
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:12px;
+  align-items:center;
+  padding:24px 12px;
+  background:#f6f1eb;
+  border-radius:12px;
+  text-align:center;
+}
+.bc-preview-team { font-size:16px; font-weight:900; }
+.bc-preview-vs { color:#850029; font-size:18px; font-weight:900; }
+.bc-preview-info-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:18px;
+}
+.bc-preview-info {
+  background:#f7f7f8;
+  padding:12px;
+  border-radius:8px;
+  overflow-wrap:anywhere;
+}
+.bc-preview-info strong { display:block; margin-top:5px; }
+.bc-preview-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:20px;
+}
+.bc-preview-note { color:#777; font-size:12px; line-height:1.5; }
+body.bc-preview-open { overflow:hidden; }
+@media(max-width:650px) {
+  .bc-preview-overlay { align-items:stretch; }
+  .bc-preview-sheet {
+    width:100%;
+    max-height:100dvh;
+    height:100dvh;
+    border-radius:0;
+  }
+  .bc-preview-body { padding:16px; }
+  .bc-preview-heading h2 { font-size:23px; }
+  .bc-preview-metrics { gap:5px; }
+  .bc-preview-metric strong { font-size:19px; }
+  .bc-preview-game { padding:11px 8px; gap:6px; }
+  .bc-preview-game-opponent { font-size:12px; }
+  .bc-preview-game-result { font-size:11px; }
+  .bc-preview-team { font-size:13px; }
+}
+
+
+/* BC_ALL_SPORTS_136 — Keep roster actions at top */
+.bc-preview-top-actions {
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+.bc-preview-top-actions .bc-preview-button {
+  min-width: 145px;
+}
+.bc-preview-body {
+  scroll-behavior: auto;
+}
+@media (max-width:650px) {
+  .bc-preview-top-actions .bc-preview-button {
+    width:100%;
+  }
+}
+
+
+/* BC_LACROSSE_137 */
+.bc-season-coming-soon {
+  background:#f6f1eb;
+  border:1px solid #e9ded2;
+  border-radius:12px;
+  padding:28px 16px;
+  text-align:center;
+  margin:18px 0;
+}
+.bc-season-coming-icon {
+  font-size:32px;
+  margin-bottom:8px;
+}
+.bc-season-coming-soon h3 {
+  color:#750023;
+  margin:0 0 8px;
+  font-size:19px;
+}
+.bc-season-coming-soon p {
+  color:#666;
+  font-size:14px;
+  line-height:1.5;
+  margin:0;
+}
+.bc-previous-season {
+  border:1px solid #e4d9d9;
+  border-radius:10px;
+  padding:12px;
+  margin-top:16px;
+}
+.bc-previous-season summary {
+  cursor:pointer;
+  font-size:14px;
+  font-weight:900;
+  color:#750023;
+  padding:6px;
+}
+.bc-previous-season[open] summary {
+  margin-bottom:12px;
+}
+
+
+/* STEP 191: RECENT SCORES SCROLL OFFSET */
+
+/* Leave room above Recent Scores when clicking Scores */
+#recent {
+  scroll-margin-top: 80px;
+}
+
+/* STEP 194: TRUE CIRCULAR SPORT PHOTOS */
+
+/* Three columns, clean spacing */
+.dashboard-page #sports-grid,
+.dashboard-page .sport-tiles {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 20px 12px !important;
+}
+
+/* Each sport occupies one centered grid cell */
+.dashboard-page #sports-grid > .bc-fav-wrap {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  min-width: 0 !important;
+  padding: 4px 0 8px !important;
+  background: transparent !important;
+}
+
+/* Circular photo: crop the actual button and its background */
+.dashboard-page #sports-grid
+.bc-fav-wrap > button.dashboard-sport-tile {
+  box-sizing: border-box !important;
+  display: block !important;
+  position: relative !important;
+
+  width: min(100%, 124px) !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: none !important;
+
+  border: 3px solid #790a30 !important;
+  border-radius: 50% !important;
+
+  padding: 0 !important;
+  margin: 0 auto !important;
+
+  overflow: hidden !important;
+
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+
+  box-shadow: 0 4px 12px rgba(40,0,15,.20) !important;
+  transition: transform .2s ease, box-shadow .2s ease !important;
+}
+
+/* Keep any existing photograph darkening within the circle */
+.dashboard-page #sports-grid
+.bc-fav-wrap > .dashboard-sport-tile::before {
+  border-radius: 50% !important;
+  inset: 0 !important;
+}
+
+/* Remove emoji from the photo, not the photo itself */
+.dashboard-page #sports-grid
+.bc-fav-wrap > .dashboard-sport-tile .tile-icon {
+  display: none !important;
+}
+
+/* Sport name underneath the circle */
+.dashboard-page #sports-grid
+.bc-fav-wrap > .bc-circle-sport-name {
+  position: static !important;
+  display: block !important;
+
+  width: 100% !important;
+  margin: 9px 0 0 !important;
+  padding: 0 2px !important;
+
+  color: #650020 !important;
+  font-family: 'Barlow Condensed', Impact, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  letter-spacing: .2px !important;
+  text-align: center !important;
+  text-shadow: none !important;
+}
+
+/* Favorite star stays a separate, working button */
+.dashboard-page #sports-grid
+.bc-fav-wrap > button.bc-fav-star {
+  position: absolute !important;
+
+  top: 0 !important;
+  right: max(0px, calc(50% - 68px)) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  border-radius: 50% !important;
+  font-size: 19px !important;
+  line-height: 1 !important;
+  z-index: 10 !important;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,.25) !important;
+}
+
+/* Hover */
+.dashboard-page #sports-grid
+.bc-fav-wrap > .dashboard-sport-tile:hover {
+  transform: translateY(-3px) scale(1.04) !important;
+  border-color: #c8a45d !important;
+  box-shadow: 0 8px 18px rgba(40,0,15,.25) !important;
+}
+
+/* Mobile */
+@media (max-width: 450px) {
+  .dashboard-page #sports-grid
+  .bc-fav-wrap > button.dashboard-sport-tile {
+    width: min(100%, 100px) !important;
+  }
+
+  .dashboard-page #sports-grid
+  .bc-fav-wrap > button.bc-fav-star {
+    right: max(0px, calc(50% - 56px)) !important;
+    width: 25px !important;
+    height: 25px !important;
+    min-width: 25px !important;
+    font-size: 17px !important;
+  }
+
+  .dashboard-page #sports-grid
+  .bc-fav-wrap > .bc-circle-sport-name {
+    font-size: 12px !important;
+  }
+}
+
+
+/* STEP 197: SPORT PHOTO CORRECTION */
+
+/* Clean background behind the circular tiles */
+body.dashboard-page #sports.dashboard-panel {
+    background: #ffffff !important;
+    background-image: none !important;
+}
+
+body.dashboard-page #sports .panel-heading,
+body.dashboard-page #sports #sports-grid {
+    background-image: none !important;
+}
+
+/* Crop every sport image into its existing circle */
+body.dashboard-page #sports-grid
+.bc-fav-wrap > .dashboard-sport-tile {
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+}
+
+/* Assign sport photographs by the label directly beneath each circle.
+   Field hockey must be checked separately from hockey. */
+
+body.dashboard-page #sports-grid
+.bc-fav-wrap:has(> .bc-circle-sport-name)
+> .dashboard-sport-tile {
+    background-image: none !important;
+}
+
+
+body.dashboard-page #sports-grid
+.bc-fav-wrap > .dashboard-sport-tile.bc-photo-football {
+    background-image: url('/static/assets/sport-football.jpg') !important;
+}
+
+body.dashboard-page #sports-grid
+.bc-fav-wrap > .dashboard-sport-tile.bc-photo-basketball {
+    background-image: url('/static/assets/sport-basketball.jpg') !important;
+}
+
+body.dashboard-page #sports-grid
+.bc-fav-wrap > .dashboard-sport-tile.bc-photo-hockey {
+    background-image: url('/static/assets/sport-hockey.jpg') !important;
+}
+
+body.dashboard-page #sports-grid
+.bc-fav-wrap > .dashboard-sport-tile.bc-photo-lacrosse {
+    background-image: url('/static/assets/sport-lacrosse.jpg') !important;
+}
+
+body.dashboard-page #sports-grid
+.bc-fav-wrap > .dashboard-sport-tile.bc-photo-soccer {
+    background-image: url('/static/assets/sport-soccer.jpg') !important;
+}
+
+body.dashboard-page #sports-grid
+.bc-fav-wrap > .dashboard-sport-tile.bc-photo-field-hockey {
+    background-image: url('/static/assets/sport-field-hockey.jpg') !important;
+}

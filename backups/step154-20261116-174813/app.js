@@ -1,0 +1,482 @@
+const state = { games: [], sports: [], activeSport: "all" };
+const $ = id => document.getElementById(id);
+
+// BC_FAVORITES_129
+const bcFavoriteKey = "bc-eagles-live-favorite-sport";
+let bcShowAllSports = false;
+
+function bcSavedFavorite() {
+  try { return localStorage.getItem(bcFavoriteKey) || ""; }
+  catch { return ""; }
+}
+
+function bcSelectedSport() {
+  return bcShowAllSports ? "" : bcSavedFavorite();
+}
+
+function bcSportId(sport) {
+  return sport.id || sport.slug || sport.name;
+}
+
+function bcFavoriteMatches(game) {
+  const favorite = bcSelectedSport();
+  if (!favorite) return true;
+  const sport = state.sports.find(s => bcSportId(s) === favorite);
+  return !!sport && game.sport === sport.name;
+}
+
+function bcUpdateFavorites() {
+  const favorite = bcSavedFavorite();
+  const selected = state.sports.find(s => bcSportId(s) === favorite);
+  document.querySelectorAll(".bc-fav-star").forEach(star => {
+    const active = star.dataset.sport === favorite;
+    star.textContent = active ? "★" : "☆";
+    star.classList.toggle("active", active);
+    star.setAttribute("aria-pressed", String(active));
+  });
+  const label = document.getElementById("bc-fav-label");
+  const toggle = document.getElementById("bc-fav-toggle");
+  if (label) label.textContent = selected
+    ? "★ Favorite: " + selected.name +
+      (bcShowAllSports ? " · All Sports View" : "")
+    : "All BC Sports";
+  if (toggle) {
+    toggle.hidden = !selected;
+    toggle.textContent = bcShowAllSports ? "Show Favorite" : "All Sports";
+  }
+}
+
+function bcRefreshFavorites() {
+  bcUpdateFavorites();
+  renderGames();
+  if (typeof window.bcRefreshLiveFavorites === "function") {
+    window.bcRefreshLiveFavorites();
+  }
+}
+
+window.bcFavoriteAllowsLive = function(sportId) {
+  return !bcSelectedSport() || bcSelectedSport() === sportId;
+};
+
+
+function safeText(value) {
+  return String(value ?? "");
+}
+
+function dateValue(game) {
+  const n = new Date(game.start).getTime();
+  return Number.isFinite(n) ? n : Infinity;
+}
+
+function formatDate(value) {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "Date TBD";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short", day: "numeric", weekday: "short",
+    timeZone: "America/New_York"
+  }).format(d);
+}
+
+function formatTime(value) {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "Time TBD";
+  const hour = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric", minute: "2-digit",
+    hour12: false, timeZone: "America/New_York"
+  }).format(d);
+  if (hour === "24:00" || hour === "00:00") return "Time TBD";
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric", minute: "2-digit",
+    timeZone: "America/New_York"
+  }).format(d) + " ET";
+}
+
+function matchup(game) {
+  const away = String(game.home_away || "").toLowerCase() === "away";
+  return "BC " + (away ? "@ " : "vs. ") + safeText(game.opponent || "Opponent TBD");
+}
+
+function gameUrl(game) {
+  try {
+    const u = new URL(game.url || "https://bceagles.com", window.location.href);
+    return u.hostname === "bceagles.com" || u.hostname.endsWith(".bceagles.com")
+      ? u.href : "https://bceagles.com";
+  } catch {
+    return "https://bceagles.com";
+  }
+}
+
+function sportIcon(name) {
+  const s = String(name).toLowerCase();
+  if (s.includes("football")) return "🏈";
+  if (s.includes("hockey") && !s.includes("field")) return "🏒";
+  if (s.includes("basketball")) return "🏀";
+  if (s.includes("lacrosse")) return "🥍";
+  if (s.includes("soccer")) return "⚽";
+  if (s.includes("field hockey")) return "🏑";
+  return "🏆";
+}
+
+
+function bcLiveStatsUrl(game) {
+  if (!game.live_stats_url) return null;
+  try {
+    const url = new URL(game.live_stats_url);
+    return ["https:", "http:"].includes(url.protocol) ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
+function gameRow(game) {
+  const link = document.createElement("a");
+  link.className = "dashboard-game-row";
+  link.href = gameUrl(game);
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+
+  const date = document.createElement("div");
+  date.className = "game-date-box";
+  date.textContent = formatDate(game.start);
+
+  const icon = document.createElement("div");
+  icon.className = "game-sport-icon";
+  icon.textContent = sportIcon(game.sport);
+
+  const details = document.createElement("div");
+  details.className = "game-row-details";
+  const sport = document.createElement("strong");
+  sport.textContent = safeText(game.sport).toUpperCase();
+  const opponent = document.createElement("div");
+  opponent.className = "game-row-opponent";
+  opponent.textContent = matchup(game);
+  details.append(sport, opponent);
+
+  const time = document.createElement("div");
+  time.className = "game-row-time";
+  time.textContent = formatTime(game.start);
+
+  const venue = document.createElement("div");
+  venue.className = "game-row-venue";
+  venue.textContent = "📍 " + (game.location || "Location TBD");
+
+  const action = document.createElement("span");
+  action.className = "game-row-action";
+  action.textContent = "DETAILS →";
+
+  link.append(date, icon, details, time, venue, action);
+
+  const liveUrl = bcLiveStatsUrl(game);
+  if (!liveUrl) return link;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "bc-game-with-stats";
+  wrapper.style.display = "flex";
+  wrapper.style.alignItems = "stretch";
+  wrapper.style.gap = "8px";
+  wrapper.style.marginBottom = "6px";
+
+  link.style.flex = "1";
+  link.style.minWidth = "0";
+
+  const stats = document.createElement("a");
+  stats.href = liveUrl;
+  stats.target = "_blank";
+  stats.rel = "noopener noreferrer";
+  stats.textContent = "LIVE STATS";
+  stats.setAttribute("aria-label",
+    "Live stats for " + matchup(game));
+  stats.style.cssText = [
+    "display:flex",
+    "align-items:center",
+    "justify-content:center",
+    "padding:10px 14px",
+    "border-radius:8px",
+    "background:#8a1538",
+    "color:white",
+    "font-size:12px",
+    "font-weight:800",
+    "text-decoration:none",
+    "white-space:nowrap",
+    "align-self:center"
+  ].join(";");
+
+  wrapper.append(link, stats);
+  return wrapper;
+}
+
+function upcomingGames() {
+  const now = Date.now();
+  return state.games
+    .filter(g => dateValue(g) >= now && dateValue(g) !== Infinity)
+    .sort((a, b) => dateValue(a) - dateValue(b));
+}
+
+function showSchedule(sport = state.activeSport) {
+  $("full-schedule").hidden = false;
+  $("sport-filter").value = sport;
+  renderSchedule();
+  $("full-schedule").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderSchedule() {
+  const sport = $("sport-filter").value;
+  // STEP 150: Full Schedule shows future games only,
+  // sorted by date and time across all sports.
+  const games = upcomingGames()
+    .filter(g => sport === "all" || g.sport === sport);
+
+  const container = $("schedule");
+  container.replaceChildren();
+  games.forEach(g => container.append(gameRow(g)));
+  if (!games.length) container.textContent = "No games found.";
+}
+
+function renderSports() {
+  const grid = $("sports-grid");
+  const select = $("sport-filter");
+  grid.replaceChildren();
+  select.replaceChildren(new Option("All Sports", "all"));
+
+  state.sports.forEach(s => {
+    const tile = document.createElement("button");
+    tile.type = "button";
+    tile.className = "dashboard-sport-tile";
+    tile.setAttribute("aria-label", "Show " + s.name + " schedule");
+
+    const icon = document.createElement("span");
+    icon.className = "tile-icon";
+    icon.textContent = sportIcon(s.name);
+    const name = document.createElement("strong");
+    name.textContent = s.name;
+    tile.append(icon, name);
+
+    // STEP 142: Open the actual sport season on the first click.
+    tile.dataset.sportId = bcSportId(s);
+    tile.onclick = () => {
+      const id = tile.dataset.sportId;
+      if (id && typeof window.bcOpenSportSeason === "function") {
+        window.bcOpenSportSeason(id);
+      } else {
+        state.activeSport = s.name;
+        showSchedule(s.name);
+      }
+    };
+    const wrap = document.createElement("div");
+    wrap.className = "bc-fav-wrap";
+
+    const star = document.createElement("button");
+    star.type = "button";
+    star.className = "bc-fav-star";
+    star.dataset.sport = bcSportId(s);
+    star.setAttribute("aria-label", "Set " + s.name + " as favorite");
+    star.addEventListener("click", event => {
+      event.stopPropagation();
+      const id = bcSportId(s);
+      try {
+        if (bcSavedFavorite() === id) localStorage.removeItem(bcFavoriteKey);
+        else localStorage.setItem(bcFavoriteKey, id);
+      } catch (error) {
+        console.warn("Favorite could not be saved", error);
+      }
+      bcShowAllSports = false;
+      bcRefreshFavorites();
+    });
+
+    wrap.append(tile, star);
+    grid.append(wrap);
+    select.add(new Option(s.name, s.name));
+  });
+}
+
+function renderGames() {
+  const future = upcomingGames().filter(bcFavoriteMatches);
+  const featured = future[0];
+  const list = $("games");
+  list.replaceChildren();
+
+  future.slice(0, 6).forEach(g => list.append(gameRow(g)));
+  if (!future.length) list.textContent = "No upcoming games found.";
+
+  if (featured) {
+    $("feature-sport").textContent = safeText(featured.sport).toUpperCase();
+    $("feature-matchup").textContent = matchup(featured);
+    $("feature-date").textContent =
+      "▦ " + formatDate(featured.start) + " · " + formatTime(featured.start);
+    $("feature-location").textContent =
+      "📍 " + (featured.location || "Location TBD");
+    $("feature-link").href = gameUrl(featured);
+  } else {
+    $("feature-matchup").textContent = "Check back for the next Eagles game";
+    $("feature-date").textContent = "";
+    $("feature-location").textContent = "";
+  }
+
+  const recent = $("recent-games");
+  recent.replaceChildren();
+
+  // Don't present past scheduled games as verified final scores.
+  // The live/results feed will be integrated in a later sprint.
+  const note = document.createElement("p");
+  note.textContent = "Verified final scores will appear here when the results feed is connected.";
+  recent.append(note);
+
+  if (!$("full-schedule").hidden) renderSchedule();
+}
+
+async function loadSports() {
+  try {
+    const response = await fetch("/api/sports");
+    if (!response.ok) throw new Error("Sports list unavailable");
+    state.sports = await response.json();
+    renderSports();
+    bcUpdateFavorites();
+    if (state.games.length) renderGames();
+  } catch (error) {
+    console.error(error);
+    $("sports-grid").textContent = "Unable to load sports.";
+  }
+}
+
+async function loadGames() {
+  $("status").textContent = "Checking official BC schedule…";
+  try {
+    const response = await fetch("/api/games");
+    if (!response.ok) throw new Error("Schedule source unavailable");
+    const data = await response.json();
+    state.games = Array.isArray(data.games) ? data.games : [];
+    $("status").textContent =
+      state.games.length + " games loaded · BC Athletics";
+    renderGames();
+  } catch (error) {
+    console.error(error);
+    $("status").textContent = "Error: " + error.message;
+  }
+}
+
+$("refresh").addEventListener("click", loadGames);
+$("view-schedule").addEventListener("click", () => showSchedule());
+$("nav-schedule").addEventListener("click", () => showSchedule());
+$("all-sports").addEventListener("click", () => showSchedule("all"));
+$("close-schedule").addEventListener("click", () => {
+  $("full-schedule").hidden = true;
+});
+$("sport-filter").addEventListener("change", renderSchedule);
+
+Promise.allSettled([loadSports(), loadGames()]);
+
+
+
+/* ===== GAMES THIS WEEK: MONDAY-SUNDAY ===== */
+
+function bcWeekDates() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+
+  const values = Object.fromEntries(
+    parts.map(p => [p.type, p.value])
+  );
+
+  const today = new Date(Date.UTC(
+    Number(values.year),
+    Number(values.month) - 1,
+    Number(values.day)
+  ));
+
+  const monday = new Date(today);
+  monday.setUTCDate(
+    today.getUTCDate() - ((today.getUTCDay() + 6) % 7)
+  );
+
+  const nextMonday = new Date(monday);
+  nextMonday.setUTCDate(monday.getUTCDate() + 7);
+
+  return {
+    monday: monday.toISOString().slice(0, 10),
+    nextMonday: nextMonday.toISOString().slice(0, 10)
+  };
+}
+
+function bcGameDay(start) {
+  const date = new Date(start);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(
+    parts.map(p => [p.type, p.value])
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function bcRenderWeeklyGames() {
+  const container = document.getElementById("games");
+  if (!container || !state || !Array.isArray(state.games)) return;
+
+  const week = bcWeekDates();
+
+  const weekly = state.games
+    .filter(g => {
+      const date = bcGameDay(g.start);
+      return bcFavoriteMatches(g) &&
+        date >= week.monday && date < week.nextMonday;
+    })
+    .sort((a, b) => {
+      const footballA = /football/i.test(a.sport || "") ? 0 : 1;
+      const footballB = /football/i.test(b.sport || "") ? 0 : 1;
+
+      if (footballA !== footballB) return footballA - footballB;
+
+      return new Date(a.start) - new Date(b.start);
+    });
+
+  container.replaceChildren();
+
+  weekly.forEach(game => {
+    if (typeof gameRow === "function") {
+      container.appendChild(gameRow(game));
+    } else if (typeof makeRow === "function") {
+      container.appendChild(makeRow(game));
+    }
+  });
+
+  if (!weekly.length) {
+    container.textContent = "No BC games scheduled this week.";
+  }
+
+  const status = document.getElementById("status");
+  if (status) {
+    status.textContent =
+      `${weekly.length} games this week · ${
+          bcSelectedSport()
+            ? (state.sports.find(s => bcSportId(s) === bcSelectedSport())?.name || "Favorite")
+            : "All BC sports"
+        }`;
+  }
+}
+
+// Automatically update after the existing games loader renders.
+// Do not overwrite loadGames() or the existing backend calls.
+const bcOriginalRenderGames = renderGames;
+
+renderGames = function(...args) {
+  const result = bcOriginalRenderGames.apply(this, args);
+  bcRenderWeeklyGames();
+  return result;
+};
+
+document.getElementById("bc-fav-toggle")?.addEventListener("click", () => {
+  bcShowAllSports = !bcShowAllSports;
+  bcRefreshFavorites();
+});
+bcUpdateFavorites();

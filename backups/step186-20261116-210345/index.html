@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#75001e">
+  <title>BC Eagles Live</title>
+  <link rel="stylesheet" href="/static/style.css?v=131">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Cinzel:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- BC-BANNER-FONTS-V53 -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
+
+<!-- BC-WORDMARK-FONTS-V55 -->
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet">
+
+<!-- BC-BANNER-V57-FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">
+<!-- BC SCRIPT MOTTO FONT V61 -->
+<link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
+<!-- BC CALLIGRAPHY FONT V62 -->
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet">
+<!-- BC STYLE SCRIPT FONT V65 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Style+Script&display=swap" rel="stylesheet">
+
+<script>
+/* BC_REFRESH_TOP_142 */
+(function () {
+  if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+  }
+
+  function resetScroll() {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }
+
+  window.addEventListener("pageshow", resetScroll);
+  window.addEventListener("load", resetScroll);
+  document.addEventListener("DOMContentLoaded", resetScroll);
+})();
+</script>
+
+</head>
+<body class="dashboard-page">
+
+<header class="eagles-banner">
+  <div class="banner-content">
+    <div class="banner-monogram"><img src="/static/assets/bc-logo.png" alt="Boston College Eagles" class="actual-bc-logo"></div>
+    <div class="banner-title">
+      <span>BOSTON COLLEGE</span>
+      <h1>EAGLES LIVE</h1>
+    </div>
+    <div class="banner-motto">Ever<br>to Excel</div>
+  </div>
+  <div class="stadium-art" aria-hidden="true"></div>
+</header>
+
+<nav class="eagles-nav" aria-label="Main navigation">
+  <a href="#home" class="nav-active">⌂ Home</a>
+  <a href="#full-schedule" id="nav-schedule">▦ Schedule</a>
+  <a href="#sports">◈ Sports</a>
+  <a href="#recent">★ Scores</a>
+  <div class="notification-control">
+    <button id="open-alert-settings" type="button"
+      aria-label="Notifications and sounds"
+      aria-controls="alerts" aria-expanded="false">♬ <span class="nav-bell">🔔</span></button>
+  </div>
+</nav>
+
+<section class="section alert-dropdown" id="alerts" hidden>
+  <h2>🔔 Notifications & Sounds</h2>
+  <div class="alert-settings">
+    <label class="alert-check">
+      <input type="checkbox" id="alert-enabled" checked>
+      Enable scoring celebrations
+    </label>
+    <label for="alert-sound">Scoring sound</label>
+    <select id="alert-sound">
+      <option value="horn">Stadium Horn</option>
+      <option value="siren">Victory Siren</option>
+      <option value="chime">Classic Chime</option>
+      <option value="fight">For Boston - BC Marching Band</option>
+      <option value="silent">Silent</option>
+    </select>
+    <label for="opponent-sound">Opponent scoring sound</label>
+    <select id="opponent-sound">
+      <option value="trombone" selected>Low Trombone</option>
+      <option value="silent">Silent</option>
+    </select>
+
+    <label class="alert-check">
+      <input type="checkbox" id="alert-vibrate" checked>
+      Vibrate when supported
+    </label>
+    <button type="button" id="test-score" class="test-score">
+      ▶ TEST EAGLES SCORE!
+    </button>
+    <p class="alert-note">In-app alerts only. Background notifications coming later.</p>
+  </div>
+</section>
+
+<main class="dashboard-main" id="home">
+  <div class="dashboard-columns">
+    <div class="dashboard-primary">
+
+      <section class="featured-game">
+        <div class="feature-label">▦ NEXT GAME</div>
+        <div class="featured-content">
+          <div class="feature-bc"><img src="/static/assets/bc-logo.png" alt="Boston College Eagles" class="actual-bc-logo"></div>
+          <div class="feature-details">
+            <div class="feature-sport" id="feature-sport">BOSTON COLLEGE ATHLETICS</div>
+            <h2 id="feature-matchup">Finding the next Eagles game…</h2>
+            <p id="feature-date"></p>
+            <p id="feature-location"></p>
+            <a id="feature-link" class="gold-action"
+               href="https://bceagles.com" target="_blank"
+               rel="noopener noreferrer">GAME DETAILS →</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard-panel" id="sports">
+        <div class="panel-heading">
+          <h2>🏆 BROWSE BY SPORT</h2>
+          <button id="all-sports" type="button" class="text-action">All Sports →</button>
+        </div>
+        <div id="sports-grid" class="sport-tiles"></div>
+      </section>
+
+      <section class="dashboard-panel" id="upcoming">
+        <div class="panel-heading">
+          <h2>▦ GAMES THIS WEEK</h2>
+          <button id="view-schedule" type="button" class="text-action">
+            View Full Schedule →
+          </button>
+        </div>
+        <div class="bc-fav-toolbar">
+          <span id="bc-fav-label">All BC Sports</span>
+          <button id="bc-fav-toggle" type="button" hidden>All Sports</button>
+        </div>
+        <div id="status" class="dashboard-status">Connecting to BC Athletics…</div>
+        <div id="bc-game-center" class="bc-game-center"></div>
+        <div id="games" class="upcoming-list"></div>
+        <button id="refresh" class="refresh-action" type="button">↻ Refresh Games</button>
+      </section>
+
+      <section class="dashboard-panel full-schedule" id="full-schedule" hidden>
+        <div class="panel-heading">
+          <h2>FULL SCHEDULE</h2>
+          <button id="close-schedule" class="text-action" type="button">Close ✕</button>
+        </div>
+        <label for="sport-filter">Filter by sport</label>
+        <select id="sport-filter"><option value="all">All Sports</option></select>
+        <div id="schedule" class="upcoming-list"></div>
+      </section>
+
+    </div>
+
+    <aside class="dashboard-sidebar">
+      
+
+      <section class="dashboard-panel" id="recent">
+        <div class="panel-heading">
+          <h2>🏆 RECENT SCORES</h2>
+        </div>
+        <div id="recent-games" class="recent-list">
+          <p>Checking official results…</p>
+        </div>
+      </section>
+
+      <section class="dashboard-panel sidebar-about">
+        <h2>EVER TO EXCEL</h2>
+        <p>Every Eagle. Every sport. One place.</p>
+        <p class="source-note">Schedules provided by BC Athletics.</p>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<div id="score-celebration" class="score-celebration"
+     role="status" aria-live="polite" hidden>
+  <div class="celebration-content">
+    <div class="celebration-eagle">BC</div>
+    <h2 id="celebration-title">EAGLES SCORE!</h2>
+    <p>GO EAGLES!</p>
+    <button type="button" id="close-celebration">Close</button>
+  </div>
+</div>
+
+<script src="/static/app.js?v=180"></script>
+<script src="/static/alerts.js?v=87"></script>
+<footer class="photo-credits">
+  Photography:
+  <a href="https://commons.wikimedia.org/wiki/File:Alumni_Stadium_Boston_College.jpg"
+     target="_blank" rel="noopener">Alumni Stadium — BCLicious</a>
+  ·
+  <a href="https://commons.wikimedia.org/wiki/File:Gasson_Hall_in_Boston_College.jpg"
+     target="_blank" rel="noopener">Gasson Hall — Amandajunyue</a>
+  · CC BY-SA 4.0 · Images cropped for layout.
+  This is an independent fan-app prototype.
+</footer>
+
+<script src="/static/sport-photos.js?v=45"></script>
+
+<!-- BROWSE BY SPORT LABEL FIX V51 -->
+<script>
+(function () {
+  function fixSportLabels() {
+    const headings = Array.from(
+      document.querySelectorAll(
+        ".sport-tile, .dashboard-sport-tile, #sports-grid, .sports-grid"
+      )
+    );
+
+    headings.forEach(container => {
+      const walker = document.createTreeWalker(
+        container,
+        NodeFilter.SHOW_TEXT
+      );
+
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+
+      nodes.forEach(node => {
+        const original = node.nodeValue;
+        const updated = original
+          .replace(/Women['’]?s\s+Lacrosse/gi, "Lacrosse")
+          .replace(/Women['’]?s\s+Field Hockey/gi, "Field Hockey");
+
+        if (updated !== original) node.nodeValue = updated;
+      });
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    fixSportLabels();
+
+    const target =
+      document.getElementById("sports-grid") ||
+      document.querySelector(".sports-grid") ||
+      document.body;
+
+    new MutationObserver(fixSportLabels).observe(target, {
+      childList: true,
+      subtree: true
+    });
+  });
+})();
+</script>
+
+
+
+
+
+
+
+<script src="/static/bc-football-photo.js?v=67"></script>
+<script src="/static/game-center.js?v=148"></script>
+<script src="/static/rosters.js?v=136"></script>
+  <script src="/static/game-previews.js?v=142" defer></script>
+
+</body>
+</html>
