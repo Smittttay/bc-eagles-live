@@ -387,7 +387,7 @@ function recentScoreRow(game) {
   button.textContent = "BOX SCORE ↗";
 
   // STEP 222B: Open native women's lacrosse statistics.
-  if (/\/sports\/womens-lacrosse\/stats\//i.test(boxUrl)) {
+  if (/\/sports\/(?:womens-lacrosse|football)\/stats\//i.test(boxUrl)) {
     const match = boxUrl.match(/\/boxscore\/(\d+)\/?$/i);
     if (match) {
       button.textContent = "BOX SCORE";

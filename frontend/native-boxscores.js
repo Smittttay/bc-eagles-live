@@ -201,6 +201,150 @@
     }
   });
 
+
+  function renderFootball(data, url) {
+    content.replaceChildren();
+
+    const bcName = "Boston College";
+    const opponent = data.opponent;
+    const bc = data.scoring[bcName];
+    const other = data.scoring[opponent];
+
+    if (!bc || !other) {
+      throw new Error("Missing football scores");
+    }
+
+    const score = el("div", null, "bc-native-score");
+
+    for (const [name, total] of [
+      [bcName, bc.total],
+      [opponent, other.total]
+    ]) {
+      const team = el("div", null, "bc-native-team");
+
+      team.appendChild(el(
+        "div", name.toUpperCase(), "bc-native-team-name"
+      ));
+
+      team.appendChild(el(
+        "div", total, "bc-native-number"
+      ));
+
+      score.appendChild(team);
+
+      if (name === bcName) {
+        score.appendChild(el(
+          "div", "FINAL", "bc-native-final"
+        ));
+      }
+    }
+
+    content.appendChild(score);
+
+    const quarters = section("Scoring by Quarter");
+
+    const periods = bc.periods.map(
+      (_, index) => "Q" + (index + 1)
+    );
+
+    quarters.appendChild(table(
+      ["Team", ...periods, "Total"],
+      [
+        [bcName, ...bc.periods, bc.total],
+        [opponent, ...other.periods, other.total]
+      ]
+    ));
+
+    if (data.scoring_plays?.length) {
+      const plays = section("Scoring Plays");
+
+      const rows = data.scoring_plays.map(play => [
+        play["Quarter"] ?? "—",
+        play["Time"] ?? "—",
+        play["Team abbreviation"] ?? "—",
+        play["Scoring play"] ?? "—"
+      ]);
+
+      plays.appendChild(table(
+        ["Quarter", "Time", "Team", "Scoring Play"],
+        rows
+      ));
+    }
+
+    if (data.team_stats?.length) {
+      const stats = section("Team Statistics");
+      const rows = [];
+      let category = "";
+
+      for (const values of data.team_stats.slice(1)) {
+        if (values.length === 1) {
+          category = values[0];
+        } else if (values.length >= 3) {
+          const label = category
+            ? category + " — " + values[0]
+            : values[0];
+
+          rows.push([
+            label,
+            values[1],
+            values[2]
+          ]);
+        }
+      }
+
+      stats.appendChild(table(
+        [
+          "Statistic",
+          data.team_stats[0]?.[1] ?? "Away",
+          data.team_stats[0]?.[2] ?? "Home"
+        ],
+        rows
+      ));
+    }
+
+    const categories = [
+      ["passing", "Passing"],
+      ["rushing", "Rushing"],
+      ["receiving", "Receiving"],
+      ["defense", "Defense"],
+      ["punting", "Punting"],
+      ["field_goals", "Field Goals"],
+      ["kickoffs", "Kickoffs"],
+      ["returns", "Returns"],
+      ["extra_points", "Extra Points"]
+    ];
+
+    for (const teamName of [bcName, opponent]) {
+      const teamData = data.players?.[teamName] || {};
+
+      for (const [key, label] of categories) {
+        const stats = teamData[key];
+
+        if (!stats?.headers?.length || !stats.rows?.length) {
+          continue;
+        }
+
+        const validRows = stats.rows.filter(
+          row => row.length === stats.headers.length
+        );
+
+        if (!validRows.length) continue;
+
+        section(teamName + " — " + label)
+          .appendChild(table(stats.headers, validRows));
+      }
+    }
+
+    officialLink(url);
+
+    content.appendChild(el(
+      "p",
+      "Football statistics sourced from the official " +
+      "Boston College Athletics box score.",
+      "bc-native-note"
+    ));
+  }
+
   function render(data, url) {
     content.replaceChildren();
 
@@ -280,7 +424,11 @@
       if (!data.scoring || !data.players || !data.team_stats) {
         throw new Error("Incomplete statistics");
       }
-      render(data, officialUrl);
+      if (data.sport === "football") {
+        renderFootball(data, officialUrl);
+      } else {
+        render(data, officialUrl);
+      }
     } catch (error) {
       if (request !== requestNumber || !overlay) return;
       content.replaceChildren();
