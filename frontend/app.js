@@ -378,54 +378,80 @@ function recentScoreRow(game) {
     return row;
   }
 
-  const wrapper = document.createElement("div");
-  wrapper.className = "bc-score-with-box";
-  wrapper.style.cssText =
-    "display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap";
-
-  row.style.flex = "1 1 260px";
-  row.style.minWidth = "0";
-
+  // STEP 212A: BOX SCORE inside the panel.
   const button = document.createElement("a");
   button.href = boxUrl;
   button.target = "_blank";
   button.rel = "noopener noreferrer";
   button.className = "bc-box-score-button";
   button.textContent = "BOX SCORE ↗";
-  button.setAttribute("aria-label",
-    "Official box score for " + matchup(game));
 
   button.style.cssText = [
     "display:inline-flex",
     "align-items:center",
     "justify-content:center",
-    "padding:10px 12px",
-    "border-radius:8px",
+    "padding:6px 8px",
+    "border-radius:7px",
     "background:#8a1538",
     "color:#fff",
-    "font-size:12px",
+    "font-size:10px",
     "font-weight:800",
     "text-decoration:none",
-    "white-space:nowrap"
+    "white-space:nowrap",
+    "flex:0 0 auto"
   ].join(";");
 
-  // Keep the game row and BOX SCORE as separate clickable elements.
-  wrapper.append(row, button);
-  wrapper.style.display = "flex";
-  wrapper.style.alignItems = "center";
-  wrapper.style.gap = "10px";
-  wrapper.style.width = "100%";
+  // Replace outer link with a clickable card to avoid
+  // nesting an anchor inside another anchor.
+  const card = document.createElement("div");
+  card.className = link.className;
+  card.style.cssText = [
+    "display:flex",
+    "align-items:center",
+    "gap:8px",
+    "width:100%",
+    "min-width:0",
+    "cursor:pointer"
+  ].join(";");
 
-  row.style.flex = "1 1 auto";
-  row.style.minWidth = "0";
+  while (link.firstChild) {
+    card.appendChild(link.firstChild);
+  }
 
-  button.style.flex = "0 0 auto";
-  button.style.margin = "0";
-  button.style.padding = "5px 8px";
-  button.style.fontSize = "10px";
-  button.style.lineHeight = "1.2";
-  button.style.whiteSpace = "nowrap";
-  return wrapper;
+  const scoreElement = card.querySelector(".game-row-time");
+  if (scoreElement) {
+    scoreElement.style.marginLeft = "auto";
+    scoreElement.style.whiteSpace = "nowrap";
+    scoreElement.insertAdjacentElement("afterend", button);
+  } else {
+    card.appendChild(button);
+  }
+
+  card.tabIndex = 0;
+  card.setAttribute("role", "link");
+  card.setAttribute("aria-label", "View game details");
+
+  const openGame = () => {
+    if (typeof window.bcOpenGamePreview === "function") {
+      window.bcOpenGamePreview(game.id);
+    } else {
+      window.open(gameUrl(game), "_blank", "noopener");
+    }
+  };
+
+  card.addEventListener("click", event => {
+    if (event.target.closest(".bc-box-score-button")) return;
+    openGame();
+  });
+
+  card.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openGame();
+    }
+  });
+
+  return card;
 }
 
 function renderRecentScores() {
