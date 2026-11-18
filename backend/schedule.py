@@ -238,7 +238,7 @@ async def fetch_sport(client, sport, now):
             "home_away": site,
             "location": location,
             "result": result,
-            "status": "final" if result else "scheduled",
+            "status": "final" if str(result or "").strip().upper().startswith(("W ", "L ", "T ")) else "scheduled",
             "url": url,
         })
 

@@ -21,12 +21,126 @@ def sports():
 @app.get("/api/games")
 async def games():
     try:
-        return await fetch_schedule()
+        schedule = await fetch_schedule()
+        return await merge_basketball_finals(schedule)
     except Exception as exc:
         raise HTTPException(
             status_code=503,
             detail="Official BC schedule could not be retrieved."
         ) from exc
+
+from backend.basketball_live import fetch_basketball_live
+
+async def merge_basketball_finals(schedule):
+    """Merge verified SIDEARM final scores into matching schedule games."""
+    import asyncio
+    import re
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    eastern = ZoneInfo("America/New_York")
+
+    def normalize_name(name):
+        name = str(name or "").lower()
+        name = re.sub(r"\\b(college|university)\\b", "", name)
+        return re.sub(r"[^a-z0-9]", "", name)
+
+    async def get_final(sport):
+        try:
+            data = await fetch_basketball_live(sport)
+            return data if data.get("status") == "final" else None
+        except Exception:
+            return None
+
+    finals = await asyncio.gather(
+        get_final("mens-basketball"),
+        get_final("womens-basketball"),
+    )
+
+    for final in finals:
+        if not final:
+            continue
+
+        home = str(final.get("home_team") or "")
+        away = str(final.get("away_team") or "")
+
+        bc_home = "boston college" in home.lower()
+        bc_away = "boston college" in away.lower()
+
+        if bc_home == bc_away:
+            continue
+
+        opponent = away if bc_home else home
+        opponent_key = normalize_name(opponent)
+
+        try:
+            game_date = datetime.strptime(
+                str(final.get("date")), "%m/%d/%Y"
+            ).date()
+            bc_score = int(
+                final["home_score"] if bc_home else final["away_score"]
+            )
+            opponent_score = int(
+                final["away_score"] if bc_home else final["home_score"]
+            )
+        except (ValueError, TypeError, KeyError):
+            continue
+
+        outcome = (
+            "W" if bc_score > opponent_score
+            else "L" if bc_score < opponent_score
+            else "T"
+        )
+
+        matches = []
+        for game in schedule.get("games", []):
+            if game.get("sport_id") != final.get("sport"):
+                continue
+
+            try:
+                start = datetime.fromisoformat(game["start"])
+                date = start.astimezone(eastern).date()
+            except (ValueError, TypeError, KeyError):
+                continue
+
+            if date != game_date:
+                continue
+
+            if normalize_name(game.get("opponent")) != opponent_key:
+                continue
+
+            matches.append(game)
+
+        # Do not overwrite anything if matching is ambiguous.
+        if len(matches) != 1:
+            continue
+
+        game = matches[0]
+
+        # Preserve a completed official schedule result.
+        if game.get("status") == "final":
+            continue
+
+        game["status"] = "final"
+        game["result"] = f"{outcome} {bc_score}-{opponent_score}"
+        game["live_game_id"] = final.get("game_id")
+        game["result_source"] = "SIDEARM"
+
+    return schedule
+
+
+@app.get("/api/live/basketball/{sport}")
+async def live_basketball(sport: str):
+    if sport not in ("mens-basketball", "womens-basketball"):
+        raise HTTPException(status_code=404, detail="Unknown basketball sport")
+    try:
+        return await fetch_basketball_live(sport)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="BC basketball live data unavailable"
+        ) from exc
+
 
 @app.get("/api/health")
 def health():

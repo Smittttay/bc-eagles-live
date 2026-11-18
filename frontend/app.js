@@ -166,48 +166,7 @@ function gameRow(game) {
 
   link.append(date, icon, details, time, venue, action);
 
-  const liveUrl = bcLiveStatsUrl(game);
-  if (!liveUrl) return link;
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "bc-game-with-stats";
-  wrapper.style.display = "flex";
-  wrapper.style.alignItems = "center";
-  wrapper.style.gap = "10px";
-  wrapper.style.marginBottom = "6px";
-
-  link.style.flex = "1 1 auto";
-  link.style.minWidth = "0";
-
-  const stats = document.createElement("a");
-  stats.href = liveUrl;
-  stats.target = "_blank";
-  stats.rel = "noopener noreferrer";
-  stats.textContent = "LIVE STATS";
-  stats.setAttribute("aria-label",
-    "Live stats for " + matchup(game));
-  stats.style.cssText = [
-    "display:flex",
-    "align-items:center",
-    "justify-content:center",
-    "padding:5px 8px",
-    "border-radius:8px",
-    "background:#8a1538",
-    "color:white",
-    "font-size:10px",
-    "font-weight:800",
-    "text-decoration:none",
-    "white-space:nowrap",
-    "align-self:center"
-  ].join(";");
-
-  wrapper.style.width = "100%";
-  stats.style.flex = "0 0 auto";
-  stats.style.margin = "0";
-  stats.style.lineHeight = "1.2";
-
-  wrapper.append(link, stats);
-  return wrapper;
+  return link;
 }
 
 function upcomingGames() {
@@ -387,7 +346,7 @@ function recentScoreRow(game) {
   button.textContent = "BOX SCORE ↗";
 
   // STEP 222B: Open native women's lacrosse statistics.
-  if (/\/sports\/(?:womens-lacrosse|football|mens-basketball|womens-basketball)\/stats\//i.test(boxUrl)) {
+  if (/\/sports\/(?:womens-lacrosse|football|mens-basketball|womens-basketball)\/stats\//i.test(boxUrl) && /\/boxscore\/\d+\/?$/i.test(boxUrl)) {
     const match = boxUrl.match(/\/boxscore\/(\d+)\/?$/i);
     if (match) {
       button.textContent = "BOX SCORE";
@@ -474,15 +433,18 @@ function renderRecentScores() {
 
   const now = Date.now();
   const cutoff = now - 7 * 24 * 60 * 60 * 1000;
+  const todayET = bcGameDay(new Date());
 
   const games = state.games
     .filter(g => {
       const time = new Date(g.start).getTime();
       const result = String(g.result || "").trim();
+      const gameDayET = bcGameDay(g.start);
 
       return Number.isFinite(time) &&
         time >= cutoff &&
         time <= now &&
+        gameDayET !== todayET &&
         String(g.status || "").toLowerCase() === "final" &&
         /^[WLTD]\s+\d+\s*[-–]\s*\d+/i.test(result);
     })
@@ -582,6 +544,25 @@ function bcWeekDates() {
   };
 }
 
+
+// Refresh completed-game placement when the Eastern Time date changes.
+let bcLastSeenDateET = "";
+
+function bcMidnightDateWatcher() {
+  const todayET = bcGameDay(new Date());
+
+  if (!todayET) return;
+
+  if (bcLastSeenDateET && todayET !== bcLastSeenDateET) {
+    loadGames();
+  }
+
+  bcLastSeenDateET = todayET;
+}
+
+bcMidnightDateWatcher();
+setInterval(bcMidnightDateWatcher, 30000);
+
 function bcGameDay(start) {
   const date = new Date(start);
   if (Number.isNaN(date.getTime())) return "";
@@ -609,7 +590,12 @@ function bcRenderWeeklyGames() {
   const weekly = state.games
     .filter(g => {
       const date = bcGameDay(g.start);
+      const status = String(g.status || "").toLowerCase();
+      const isLive = ["live", "in_progress", "in progress"].includes(status);
+      const isFinal = ["final", "completed"].includes(status);
+
       return bcFavoriteMatches(g) &&
+        !isLive && !isFinal &&
         date >= week.monday && date < week.nextMonday;
     })
     .sort((a, b) => {

@@ -2,6 +2,27 @@
   const root = document.getElementById("bc-game-center");
   if (!root) return;
 
+
+  const weeklyPanel = document.getElementById("upcoming");
+  const weeklyGames = document.getElementById("games");
+
+  if (weeklyPanel && weeklyGames) {
+    const liveSection = document.createElement("section");
+    liveSection.id = "bc-live-section";
+    liveSection.className = "dashboard-panel";
+    liveSection.hidden = true;
+
+    const heading = document.createElement("div");
+    heading.className = "panel-heading";
+
+    const title = document.createElement("h2");
+    title.textContent = "● LIVE BC GAMES";
+    heading.append(title);
+
+    liveSection.append(heading, root);
+    weeklyPanel.insertBefore(liveSection, weeklyGames);
+  }
+
   const expanded = new Set();
   const selectedTabs = {};
   const selectedTeams = {};
@@ -30,6 +51,13 @@
   function normalizeSoccer(game) {
     if (!game || game.status === "no_game") return null;
     if (!["live", "final"].includes(game.status)) return null;
+    if (game.status === "final") {
+      const date = String(game.date || "");
+      if (!date || (
+        !date.includes(easternDate()) &&
+        !date.includes(new Date().toISOString().slice(0, 10))
+      )) return null;
+    }
 
     return {
       id: "soccer-" + game.contest_id,
@@ -67,7 +95,7 @@
     return {
       id: "hockey-" + date,
       sport: "MEN'S HOCKEY",
-      opponent: bcHome ? game.away_team : game.home_team,
+      opponent: shortTeamName(bcHome ? game.away_team : game.home_team),
       bcScore: bcHome ? game.home_score : game.away_score,
       opponentScore: bcHome ? game.away_score : game.home_score,
       status: game.status,
@@ -85,13 +113,225 @@
     };
   }
 
+
+  function normalizeBasketball(game) {
+    if (!game || !["live", "final"].includes(game.status)) return null;
+
+    const bcHome = /boston college/i.test(game.home_team || "");
+    const bcAway = /boston college/i.test(game.away_team || "");
+    if (!bcHome && !bcAway) return null;
+
+    // SIDEARM may retain an older game. Only show today's game.
+    if (game.date !== easternDate()) return null;
+
+    const sportId = game.sport;
+    if (!["mens-basketball", "womens-basketball"].includes(sportId))
+      return null;
+
+    return {
+      id: sportId + "-" + game.date,
+      sportId,
+      sport: sportId === "womens-basketball"
+        ? "WOMEN'S BASKETBALL"
+        : "MEN'S BASKETBALL",
+      opponent: shortTeamName(bcHome ? game.away_team : game.home_team),
+      bcScore: bcHome ? game.home_score : game.away_score,
+      opponentScore: bcHome ? game.away_score : game.home_score,
+      status: game.status,
+      period: game.status === "final"
+        ? "FINAL"
+        : (game.period ? "Q" + game.period : "In Progress"),
+      clock: game.status === "final" ? null : game.clock,
+      bcHome,
+      teamStats: {
+        bc: bcHome ? game.team_stats?.home : game.team_stats?.away,
+        opponent: bcHome ? game.team_stats?.away : game.team_stats?.home
+      },
+      playerStats: {
+        bc: bcHome ? game.player_stats?.home : game.player_stats?.away,
+        opponent: bcHome ? game.player_stats?.away : game.player_stats?.home
+      },
+      plays: Array.isArray(game.plays) ? game.plays : []
+    };
+  }
+
   async function request(url) {
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) throw new Error(url + ": " + response.status);
     return response.json();
   }
 
+
+  function basketballTeamStats(game) {
+    const bc = game.teamStats?.bc || {};
+    const opp = game.teamStats?.opponent || {};
+
+    const fields = [
+      ["Points", "Points"],
+      ["Field Goals", "Fgam"],
+      ["FG %", "ShootingPercentage"],
+      ["3-Pointers", "Tpam"],
+      ["3PT %", "Tppercentage"],
+      ["Free Throws", "Ftma"],
+      ["FT %", "Ftp"],
+      ["Rebounds", "TotalRebounds"],
+      ["Offensive Rebounds", "OffensiveRebounds"],
+      ["Defensive Rebounds", "DefensiveRebounds"],
+      ["Assists", "Assists"],
+      ["Turnovers", "Turnovers"],
+      ["Steals", "Steals"],
+      ["Blocks", "Blocks"],
+      ["Personal Fouls", "PersonalFouls"],
+      ["Points in Paint", "PointsInPaint"],
+      ["Fast Break Points", "PointsOffFastBreak"],
+      ["Second Chance Points", "PointsOffSecondChance"]
+    ];
+
+    const table = element("table", "gc-table");
+    const head = element("tr");
+
+    ["STAT", "BC", "OPP"].forEach(label =>
+      head.append(element("th", "", label))
+    );
+    table.append(head);
+
+    let count = 0;
+
+    fields.forEach(([label, key]) => {
+      if (bc[key] == null && opp[key] == null) return;
+
+      const row = element("tr");
+      row.append(
+        element("td", "", label),
+        element("td", "", value(bc[key])),
+        element("td", "", value(opp[key]))
+      );
+      table.append(row);
+      count++;
+    });
+
+    return count ? table : element(
+      "p", "gc-empty", "Team statistics are not available yet."
+    );
+  }
+
+  function basketballPlayerStats(game) {
+    const choice = selectedTeams[game.id] || "bc";
+    const wrap = element("div");
+
+    const toggle = element("div", "gc-team-toggle");
+
+    [["bc", "BC"], ["opponent", game.opponent]]
+      .forEach(([key, label]) => {
+        const button = element(
+          "button", choice === key ? "active" : "", label
+        );
+        button.type = "button";
+        button.addEventListener("click", () => {
+          selectedTeams[game.id] = key;
+          renderDetails(game);
+        });
+        toggle.append(button);
+      });
+
+    wrap.append(toggle);
+
+    const players = game.playerStats?.[choice];
+
+    if (!Array.isArray(players) || !players.length) {
+      wrap.append(element(
+        "p", "gc-empty", "Player statistics are not available yet."
+      ));
+      return wrap;
+    }
+
+    const scroller = element("div");
+    scroller.style.overflowX = "auto";
+
+    const table = element("table", "gc-table");
+
+    const columns = [
+      ["Name", "PLAYER"],
+      ["Minutes", "MIN"],
+      ["Points", "PTS"],
+      ["TotalRebounds", "REB"],
+      ["Assists", "AST"],
+      ["Fgam", "FG"],
+      ["Tpam", "3PT"],
+      ["Ftma", "FT"],
+      ["Steals", "STL"],
+      ["Blocks", "BLK"],
+      ["Turnovers", "TO"]
+    ];
+
+    const head = element("tr");
+    columns.forEach(([, label]) =>
+      head.append(element("th", "", label))
+    );
+    table.append(head);
+
+    players.forEach(player => {
+      if (!player || typeof player !== "object") return;
+
+      const row = element("tr");
+      columns.forEach(([key]) =>
+        row.append(element("td", "", value(player[key])))
+      );
+      table.append(row);
+    });
+
+    scroller.append(table);
+    wrap.append(scroller);
+    return wrap;
+  }
+
+  function basketballPlayByPlay(game) {
+    if (!game.plays?.length) {
+      return element(
+        "p", "gc-empty", "Play-by-play is not available yet."
+      );
+    }
+
+    const wrap = element("div");
+    wrap.style.maxHeight = "420px";
+    wrap.style.overflowY = "auto";
+
+    game.plays.slice(-75).reverse().forEach(play => {
+      if (!play?.description) return;
+
+      let team = "";
+
+      if (play.team === "HomeTeam") {
+        team = game.bcHome ? "BC" : "OPP";
+      } else if (play.team === "VisitingTeam") {
+        team = game.bcHome ? "OPP" : "BC";
+      }
+
+      const period = play.period ? "Q" + play.period : "";
+      const prefix = [period, play.clock, team]
+        .filter(Boolean).join(" · ");
+
+      const row = element("p", "gc-play");
+      row.textContent = prefix
+        ? prefix + " — " + play.description
+        : play.description;
+
+      wrap.append(row);
+    });
+
+    return wrap;
+  }
+
+  function shortTeamName(name) {
+    return String(name || "")
+      .replace(/Boston College/gi, "BC")
+      .replace(/Merrimack College/gi, "Merrimack");
+  }
+
   function statsRows(game) {
+    if (game.sportId?.includes("basketball"))
+      return basketballTeamStats(game);
+
     if (!game.teamStats) {
       return element("p", "gc-empty",
         "Detailed team statistics are not available from this feed yet.");
@@ -127,11 +367,14 @@
   }
 
   function playerRows(game) {
+    if (game.sportId?.includes("basketball"))
+      return basketballPlayerStats(game);
+
     const choice = selectedTeams[game.id] || "bc";
     const wrap = element("div");
 
     const toggle = element("div", "gc-team-toggle");
-    [["bc", "BOSTON COLLEGE"], ["opponent", game.opponent]].forEach(
+    [["bc", "BC"], ["opponent", game.opponent]].forEach(
       ([key, label]) => {
         const button = element("button", key === choice ? "active" : "", label);
         button.type = "button";
@@ -193,6 +436,9 @@
   }
 
   function playRows(game) {
+    if (game.sportId?.includes("basketball"))
+      return basketballPlayByPlay(game);
+
     if (!game.plays?.length) {
       return element("p", "gc-empty",
         "Play-by-play is not available from this feed yet.");
@@ -279,7 +525,7 @@
 
     const fields = card.querySelector(".gc-summary").children;
     fields[0].textContent = game.sport;
-    fields[1].textContent = "BOSTON COLLEGE   " + value(game.bcScore);
+    fields[1].textContent = "BC   " + value(game.bcScore);
     fields[2].textContent =
       game.opponent.toUpperCase() + "   " + value(game.opponentScore);
 
@@ -297,7 +543,9 @@
   async function refresh() {
     const feeds = await Promise.allSettled([
       request("/api/live/soccer"),
-      request("/api/live/hockey")
+      request("/api/live/hockey"),
+      request("/api/live/basketball/mens-basketball"),
+      request("/api/live/basketball/womens-basketball")
     ]);
 
     const games = [];
@@ -312,14 +560,23 @@
       if (game) games.push(game);
     }
 
+
+    for (const index of [2, 3]) {
+      if (feeds[index].status === "fulfilled") {
+        const game = normalizeBasketball(feeds[index].value);
+        if (game) games.push(game);
+      }
+    }
+
     games.sort((a, b) =>
       (a.status === "live" ? 0 : 1) -
       (b.status === "live" ? 0 : 1)
     );
 
     const shownGames = games.filter(g => {
-      const id = /soccer/i.test(g.sport) ? "mens-soccer"
-        : /hockey/i.test(g.sport) ? "mens-ice-hockey" : "";
+      const id = g.sportId ||
+        (/soccer/i.test(g.sport) ? "mens-soccer"
+        : /hockey/i.test(g.sport) ? "mens-ice-hockey" : "");
       return !window.bcFavoriteAllowsLive ||
         window.bcFavoriteAllowsLive(id);
     });
@@ -334,12 +591,19 @@
 
     root.replaceChildren();
 
-    // No games available: leave the Live Game Center empty.
-    // Real live/final games will still display normally.
-    shownGames.forEach(game => root.append(updateCard(game)));
+    // Live games first, followed by today's completed games.
+    const displayGames = shownGames.filter(g =>
+      g.status === "live" || g.status === "final"
+    );
+
+    root.replaceChildren();
+    displayGames.forEach(game => root.append(updateCard(game)));
+
+    const section = document.getElementById("bc-live-section");
+    if (section) section.hidden = displayGames.length === 0;
 
     const failures = feeds.filter(f => f.status === "rejected").length;
-    if (failures) {
+    if (failures && displayGames.length) {
       root.append(element("p", "gc-warning",
         failures + " live data source(s) unavailable."));
     }
